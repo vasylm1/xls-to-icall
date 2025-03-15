@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>XLS to iCal Converter</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, #fdfbfb, #ebedee);
+      margin: 0;
+      padding: 30px;
+    }
+    h1 {
+      color: #2c3e50;
+      background: #dfe9f3;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+    .language-picker {
+      margin-bottom: 25px;
+      text-align: center;
+    }
+    select {
+      padding: 10px 16px;
+      border-radius: 6px;
+      border: 1px solid #bbb;
+      font-size: 1em;
+      background: #f9f9f9;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+    input[type="file"] {
+      display: block;
+      margin: 25px auto;
+      padding: 12px;
+      background: #ffffff;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      width: fit-content;
+    }
+    button {
+      display: block;
+      margin: 10px auto;
+      padding: 12px 24px;
+      background-color: #2980b9;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1em;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    button:hover {
+      background-color: #1f6391;
+    }
+    #downloadLink {
+      display: block;
+      margin: 20px auto;
+      padding: 12px 24px;
+      background: #27ae60;
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      width: fit-content;
+      text-align: center;
+    }
+    #downloadLink:hover {
+      background: #1e8c4d;
+    }
+    footer {
+      margin-top: 50px;
+      padding-top: 20px;
+      border-top: 1px solid #ccc;
+      font-size: 0.9em;
+      color: #777;
+      text-align: center;
+    }
+    footer a {
+      color: #2980b9;
+      text-decoration: none;
+    }
+    footer a:hover {
+      text-decoration: underline;
+    }
+    .footer-icon {
+      margin-right: 8px;
+      color: #2980b9;
+    }
+  </style>
+</head>
+<body>
+  <h1 id="title">XLS to iCal Converter</h1>
+
+  <div class="language-picker">
+    <label for="language" id="languageLabel">Choose language:</label>
+    <select id="language" onchange="switchLanguage()">
+      <option value="en">🇬🇧 English</option>
+      <option value="pl">🇵🇱 Polski</option>
+      <option value="de">🇩🇪 Deutsch</option>
+      <option value="uk">🇺🇦 Українська</option>
+      <option value="es">🇪🇸 Español</option>
+    </select>
+  </div>
+
+  <input type="file" id="fileInput" accept=".xls,.xlsx" />
+  <button onclick="convertToIcs()" id="convertButton">Convert to ICS</button>
+  <a id="downloadLink" style="display:none">Download ICS</a>
+
+  <script>
+    const translations = {
+      en: {
+        title: "XLS to iCal Converter",
+        convert: "Convert to ICS",
+        download: "Download ICS File",
+        chooseLang: "Choose language:"
+      },
+      pl: {
+        title: "Konwerter XLS na iCal",
+        convert: "Konwertuj do ICS",
+        download: "Pobierz plik ICS",
+        chooseLang: "Wybierz język:"
+      },
+      de: {
+        title: "XLS zu iCal Konverter",
+        convert: "In ICS umwandeln",
+        download: "ICS-Datei herunterladen",
+        chooseLang: "Sprache wählen:"
+      },
+      uk: {
+        title: "Конвертер XLS у iCal",
+        convert: "Конвертувати в ICS",
+        download: "Завантажити файл ICS",
+        chooseLang: "Виберіть мову:"
+      },
+      es: {
+        title: "Convertidor de XLS a iCal",
+        convert: "Convertir a ICS",
+        download: "Descargar archivo ICS",
+        chooseLang: "Seleccionar idioma:"
+      }
+    };
+
+    function switchLanguage() {
+      const lang = document.getElementById("language").value;
+      document.getElementById("title").textContent = translations[lang].title;
+      document.getElementById("convertButton").textContent = translations[lang].convert;
+      document.getElementById("languageLabel").textContent = translations[lang].chooseLang;
+      const downloadLink = document.getElementById("downloadLink");
+      if (downloadLink.style.display !== "none") {
+        downloadLink.textContent = translations[lang].download;
+      }
+    }
+
+    function detectBrowserLanguage() {
+      const userLang = navigator.language.slice(0, 2);
+      const langSelect = document.getElementById("language");
+      const supportedLangs = Object.keys(translations);
+      const defaultLang = supportedLangs.includes(userLang) ? userLang : 'en';
+      langSelect.value = defaultLang;
+      switchLanguage();
+    }
+
+    function convertToIcs() {
+      const fileInput = document.getElementById('fileInput');
+      if (!fileInput.files.length) {
+        alert('Please upload an XLS/XLSX file first.');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+        const json = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+        let icsContent = "BEGIN:VCALENDAR\nVERSION:2.0\nCALSCALE:GREGORIAN\n";
+
+        for (let i = 1; i < json.length; i++) {
+          const row = json[i];
+          if (!row[0] || !row[1]) continue;
+          const startDate = formatDate(row[0]);
+          const endDate = formatDate(row[1]);
+          const summary = row[3] || "Class";
+          const description = (row[6] || '') + ' - ' + (row[7] || '');
+          const location = row[9] || "Online";
+
+          icsContent += `BEGIN:VEVENT\nSUMMARY:${summary}\nDESCRIPTION:${description}\nLOCATION:${location}\nDTSTART:${startDate}\nDTEND:${endDate}\nEND:VEVENT\n`;
+        }
+
+        icsContent += "END:VCALENDAR";
+
+        const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+        const link = document.getElementById('downloadLink');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'calendar.ics';
+        const lang = document.getElementById("language").value;
+        link.textContent = translations[lang].download;
+        link.style.display = 'block';
+      };
+      reader.readAsArrayBuffer(fileInput.files[0]);
+    }
+
+    function formatDate(str) {
+      const parts = str.toString().match(/\d{2}\.\d{2}\.\d{4} \d{2}:\d{2}/);
+      if (!parts) return '';
+      const [day, month, year, hour, min] = parts[0].split(/\.| |:/);
+      return `${year}${month}${day}T${hour}${min}00Z`;
+    }
+
+    window.onload = detectBrowserLanguage;
+  </script>
+
+  <footer>
+    <p>Created by <strong>Vasyl Madei</strong></p>
+    <p><i class="fab fa-linkedin footer-icon"></i><a href="https://www.linkedin.com/in/vasyl-madei-399488247/" target="_blank">Vasyl Madei</a></p>
+  </footer>
+</body>
+</html>
