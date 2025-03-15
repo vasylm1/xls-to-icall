@@ -209,7 +209,7 @@
       const parts = str.toString().match(/\d{2}\.\d{2}\.\d{4} \d{2}:\d{2}/);
       if (!parts) return '';
       const [day, month, year, hour, min] = parts[0].split(/\.| |:/);
-      return `${year}${month}${day}T${hour}${min}00Z`;
+      return `${year}${month}${day}T${hour}${min}00`;
     }
 
     window.onload = detectBrowserLanguage;
