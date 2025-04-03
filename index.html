@@ -90,6 +90,19 @@
       margin-right: 8px;
       color: #2980b9;
     }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      font-size: 0.95em;
+    }
+    table, th, td {
+      border: 1px solid #ccc;
+      padding: 10px;
+    }
+    table thead {
+      background-color: #dfe9f3;
+    }
   </style>
 </head>
 <body>
@@ -219,5 +232,33 @@
     <p>Created by <strong>Vasyl Madei</strong></p>
     <p><i class="fab fa-linkedin footer-icon"></i><a href="https://www.linkedin.com/in/vasyl-madei-399488247/" target="_blank">Vasyl Madei</a></p>
   </footer>
+
+  <!-- How to Use Section -->
+  <section style="margin-top: 60px; background: #f0f4f8; padding: 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+    <h2 style="text-align:center; color:#2c3e50;">\ud83d\udcd8 How to Use</h2>
+    <p>Prepare your Excel file (.xls or .xlsx) with the following structure:</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Start Date</th><th>End Date</th><th>[C]</th><th>Title</th><th>[E]</th><th>[F]</th><th>Description</th><th>Room</th><th>[I]</th><th>Location</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>05.04.2025 09:00</td><td>05.04.2025 10:30</td><td></td><td>Project Kickoff</td><td></td><td></td><td>Initial Meeting</td><td>Conf Room A</td><td></td><td>HQ - Warsaw</td>
+        </tr>
+      </tbody>
+    </table>
+    <p style="margin-top: 20px;">
+      <strong>Notes:</strong>
+      <ul style="line-height: 1.6; margin-left: 20px;">
+        <li><code>Start Date</code> and <code>End Date</code> must be in format <strong>dd.mm.yyyy hh:mm</strong></li>
+        <li><code>Title</code> is optional (defaults to "Class")</li>
+        <li><code>Description</code> and <code>Room</code> are optional (joined together)</li>
+        <li><code>Location</code> is optional (defaults to "Online")</li>
+        <li>Only the <strong>first sheet</strong> of your Excel file is used</li>
+      </ul>
+    </p>
+  </section>
 </body>
 </html>
