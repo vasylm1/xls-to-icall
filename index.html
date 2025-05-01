@@ -161,16 +161,6 @@
       margin-bottom: 1.5rem;
       text-align: center;
     }
-    .debug-info {
-      font-family: monospace;
-      background: #f0f0f0;
-      padding: 1rem;
-      border-radius: 8px;
-      margin-top: 1rem;
-      max-height: 200px;
-      overflow-y: auto;
-      display: none;
-    }
   </style>
 </head>
 <body>
@@ -209,11 +199,6 @@
       <a id="downloadLink" class="btn btn-success" download="plan_zajec.ics">
         <i class="fas fa-download"></i> <span id="downloadText">Pobierz plik ICS</span>
       </a>
-
-      <div id="debugInfo" class="debug-info"></div>
-      <button onclick="toggleDebug()" class="btn" style="margin-top: 1rem; background: #666;">
-        <i class="fas fa-bug"></i> Pokaż debug
-      </button>
     </div>
 
     <div id="about" class="tab-content" role="tabpanel" aria-labelledby="tab-about" hidden>
@@ -320,7 +305,6 @@
     function formatDate(dateStr) {
       if (!dateStr) return '';
       
-      // Handle Polish date format: "DD.MM.YYYY HH:mm"
       if (typeof dateStr === 'string') {
         const plMatch = dateStr.match(/(\d{2})\.(\d{2})\.(\d{4}) (\d{2}):(\d{2})/);
         if (plMatch) {
@@ -329,19 +313,16 @@
         }
       }
       
-      // Handle Excel serial dates (numbers)
       if (typeof dateStr === 'number') {
-        const date = new Date(Math.round((dateStr - 25569) * 86400 * 1000); // Excel to JS date
+        const date = new Date(Math.round((dateStr - 25569) * 86400 * 1000));
         return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
       }
       
-      // Try to parse as Date object
       const date = new Date(dateStr);
       if (!isNaN(date.getTime())) {
         return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
       }
       
-      console.warn("Unrecognized date format:", dateStr);
       return '';
     }
 
@@ -366,23 +347,10 @@
       );
     }
 
-    function logDebug(message) {
-      const debugDiv = document.getElementById('debugInfo');
-      debugDiv.innerHTML += `<div>${new Date().toLocaleTimeString()}: ${message}</div>`;
-      console.log(message);
-    }
-
-    function toggleDebug() {
-      const debugDiv = document.getElementById('debugInfo');
-      debugDiv.style.display = debugDiv.style.display === 'none' ? 'block' : 'none';
-    }
-
     function convertToIcs() {
       const lang = document.getElementById("languageSelectConverter").value;
       const t = translations[lang];
       const fileInput = document.getElementById("fileInput");
-      const debugDiv = document.getElementById('debugInfo');
-      debugDiv.innerHTML = '';
       
       if (!fileInput.files.length) {
         showError(t.noFileError);
@@ -412,8 +380,6 @@
           }
           
           const headers = json[0].map(h => String(h).trim());
-          logDebug("Excel Headers: " + headers.join(', '));
-          
           if (!validateExcelHeaders(headers)) {
             throw new Error(t.invalidFileError);
           }
@@ -421,29 +387,23 @@
           let ics = `BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//AEH Schedule Converter//EN\nCALSCALE:GREGORIAN\n`;
           ics += `BEGIN:VTIMEZONE\nTZID=Europe/Warsaw\nBEGIN:STANDARD\nDTSTART:19701025T030000\nTZOFFSETFROM:+0200\nTZOFFSETTO:+0100\nTZNAME:CET\nEND:STANDARD\nBEGIN:DAYLIGHT\nDTSTART:19700329T020000\nTZOFFSETFROM:+0100\nTZOFFSETTO:+0200\nTZNAME:CEST\nEND:DAYLIGHT\nEND:VTIMEZONE\n`;
           
-          let eventCount = 0;
-          
           for (let i = 1; i < json.length; i++) {
             const row = json[i];
             if (!row || row.length < 10) continue;
             
-            // Map columns (adjust indices if needed)
-            const start = formatDate(row[0]); // A - data rozpoczęcia
-            const end = formatDate(row[1]);   // B - data zakończenia
-            const hours = row[2];             // C - godziny planowane
-            const summary = row[3];          // D - nazwa pełna przedmiotu
-            const groupThematic = row[4];     // E - grupa tematyczna
-            const groupClass = row[5];        // F - grupa zajęciowa
-            const lecturer = row[6];          // G - wykładowcy
-            const stageType = row[7];        // H - rodzaj etapu
-            const deanGroups = row[8];       // I - grupy dziekańskie
-            const room = row[9] || '';       // J - sala
+            const start = formatDate(row[0]);
+            const end = formatDate(row[1]);
+            const hours = row[2];
+            const summary = row[4];
+            const groupThematic = row[5];
+            const groupClass = row[6];
+            const lecturer = row[7];
+            const stageType = row[8];
+            const deanGroups = row[9];
+            const room = row[10] || '';
             
-            if (!start || !end || !summary) {
-              logDebug(`Skipping row ${i} (missing date/summary): ${JSON.stringify(row)}`);
-              continue;
-            }
-            
+            if (!start || !summary) continue;
+
             const description = escapeIcalText([
               groupThematic && `Grupa tematyczna: ${groupThematic}`,
               groupClass && `Grupa zajęciowa: ${groupClass}`,
@@ -465,19 +425,9 @@
             if (location) ics += `LOCATION:${escapeIcalText(location)}\n`;
             ics += `UID:${Date.now()}-${i}@aeh-converter\n`;
             ics += `END:VEVENT\n`;
-            
-            eventCount++;
-            logDebug(`Added event: ${summary} (${start} - ${end})`);
           }
           
           ics += `END:VCALENDAR`;
-          
-          logDebug(`Generated ICS with ${eventCount} events`);
-          console.log("ICS Content:", ics);
-          
-          if (eventCount === 0) {
-            throw new Error("No valid events found in the file");
-          }
           
           const blob = new Blob([ics], { type: 'text/calendar' });
           const link = document.getElementById('downloadLink');
@@ -485,7 +435,6 @@
           link.style.display = 'inline-block';
           
         } catch (err) {
-          logDebug(`Error: ${err.message}`);
           showError(t.fileError + err.message);
         } finally {
           loadingIndicator.style.display = 'none';
@@ -494,7 +443,6 @@
       };
       
       reader.onerror = function() {
-        logDebug(`File read error: ${reader.error}`);
         showError(t.fileError + reader.error);
         loadingIndicator.style.display = 'none';
         convertBtn.disabled = false;
@@ -512,7 +460,6 @@
       }, 5000);
     }
 
-    // Initialize the app
     window.onload = () => {
       setLanguage('pl');
       
