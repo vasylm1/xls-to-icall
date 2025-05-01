@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pl">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Class Schedule Converter</title>
+  <title>Konwerter Planu Zajęć</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
@@ -149,46 +149,46 @@
 <body>
   <div class="container">
     <div class="tabs" role="tablist">
-      <div class="tab active" onclick="switchTab('converter')" role="tab" aria-selected="true" aria-controls="converter" id="tab-converter">Converter</div>
-      <div class="tab" onclick="switchTab('about')" role="tab" aria-selected="false" aria-controls="about" id="tab-about">About</div>
+      <div class="tab active" onclick="switchTab('converter')" role="tab" aria-selected="true" aria-controls="converter" id="tab-converter">Konwerter</div>
+      <div class="tab" onclick="switchTab('about')" role="tab" aria-selected="false" aria-controls="about" id="tab-about">O programie</div>
     </div>
 
     <div id="converter" class="tab-content active" role="tabpanel" aria-labelledby="tab-converter">
-      <h1 id="mainTitle">📅 Class Schedule Converter</h1>
+      <h1 id="mainTitle">📅 Konwerter Planu Zajęć</h1>
 
-      <label id="languageLabel" for="languageSelect">🌍 Language:</label>
+      <label id="languageLabel" for="languageSelect">🌍 Język:</label>
       <select id="languageSelect" onchange="setLanguage()">
         <option value="en">English</option>
-        <option value="pl">Polski</option>
+        <option value="pl" selected>Polski</option>
         <option value="uk">Українська</option>
       </select>
 
-      <label for="fileInput" id="fileLabel">Select your schedule file:</label>
+      <label for="fileInput" id="fileLabel">Wybierz plik z planem zajęć:</label>
       <input type="file" id="fileInput" accept=".xls,.xlsx" aria-describedby="fileError fileInfo">
       <div id="fileInfo" class="file-info"></div>
       <div id="fileError" class="error-message"></div>
 
       <button onclick="convertToIcs()" class="btn" id="convertBtn" disabled>
-        <i class="fas fa-exchange-alt"></i> <span id="convertText">Convert to Calendar</span>
+        <i class="fas fa-exchange-alt"></i> <span id="convertText">Konwertuj do Kalendarza</span>
       </button>
 
       <div class="loading" id="loadingIndicator">
         <div class="spinner"></div>
-        <p id="loadingText">Processing your schedule...</p>
+        <p id="loadingText">Przetwarzanie planu zajęć...</p>
       </div>
 
-      <a id="downloadLink" class="btn btn-success" download="class_schedule.ics">
-        <i class="fas fa-download"></i> <span id="downloadText">Download ICS File</span>
+      <a id="downloadLink" class="btn btn-success" download="plan_zajec.ics">
+        <i class="fas fa-download"></i> <span id="downloadText">Pobierz plik ICS</span>
       </a>
     </div>
 
     <div id="about" class="tab-content" role="tabpanel" aria-labelledby="tab-about" hidden>
-      <h2 id="aboutTitle">About</h2>
-      <p id="aboutText1"></p>
-      <p id="aboutText2"></p>
-      <p id="aboutText3"></p>
-      <p id="aboutText4"></p>
-      <a href="https://www.linkedin.com/in/vasyl-madei-399488247/" target="_blank" class="btn" id="linkedinText">LinkedIn Profile</a>
+      <h2 id="aboutTitle">O programie</h2>
+      <p id="aboutText1">Konwerter planu zajęć umożliwia transformację harmonogramu w formacie Excel do pliku kalendarza (.ics) kompatybilnego z większością aplikacji kalendarzowych.</p>
+      <p id="aboutText2">Program obsługuje pliki w formacie XLS/XLSX z kolumnami: daty rozpoczęcia i zakończenia, nazwa przedmiotu, grupa, wykładowca i sala.</p>
+      <p id="aboutText3">Automatycznie rozpoznaje zajęcia odbywające się na platformie Microsoft Teams.</p>
+      <p id="aboutText4">Wersja 1.0 | © 2023</p>
+      <a href="https://www.linkedin.com/in/vasyl-madei-399488247/" target="_blank" class="btn" id="linkedinText">Profil LinkedIn</a>
     </div>
   </div>
 
@@ -199,48 +199,48 @@
         convertText: "Convert to Calendar",
         downloadText: "Download ICS File",
         noFileError: "Please select a file first",
-        invalidFileError: "The selected file is not a valid Excel schedule file",
+        invalidFileError: "The selected file is not a valid schedule file",
         fileError: "Error processing file: ",
         loadingText: "Processing your schedule...",
         aboutTitle: "About",
-        aboutText1: "I'm a marketing professional with a background in office administration, technical support, and product marketing.",
-        aboutText2: "My work focuses on supporting launches, creating marketing materials, and improving content quality using Power BI, Excel, SAP and Power Platform.",
-        aboutText3: "I speak Ukrainian, Polish, English, and German, and I'm learning Spanish and Chinese.",
-        aboutText4: "Outside of work, I'm passionate about travel, reading, exploring tech, staying active, and organizing events.",
+        aboutText1: "Class schedule converter that transforms Excel files to calendar format (.ics).",
+        aboutText2: "Supports XLS/XLSX files with columns for start/end dates, subject name, group, lecturer and room.",
+        aboutText3: "Automatically detects Microsoft Teams meetings.",
+        aboutText4: "Version 1.0 | © 2023",
         linkedinText: "LinkedIn Profile",
-        fileInfo: "Expected format: Excel file with columns for date/time, subject, group, lecturer, etc."
+        fileInfo: "Expected format: Excel file with schedule data"
       },
       pl: {
         fileLabel: "Wybierz plik z planem zajęć:",
         convertText: "Konwertuj do Kalendarza",
         downloadText: "Pobierz plik ICS",
         noFileError: "Proszę wybrać plik",
-        invalidFileError: "Wybrany plik nie jest prawidłowym plikiem Excel z planem zajęć",
+        invalidFileError: "Wybrany plik nie jest prawidłowym plikiem z planem zajęć",
         fileError: "Błąd przetwarzania pliku: ",
         loadingText: "Przetwarzanie planu zajęć...",
-        aboutTitle: "O mnie",
-        aboutText1: "Jestem specjalistą ds. marketingu z doświadczeniem w administracji, wsparciu technicznym i marketingu produktowym.",
-        aboutText2: "Moja praca to wspieranie wdrożeń, tworzenie materiałów i poprawa jakości treści z użyciem Power BI, Excel, SAP i Power Platform.",
-        aboutText3: "Mówię po ukraińsku, polsku, angielsku i niemiecku, uczę się hiszpańskiego i chińskiego.",
-        aboutText4: "Po pracy lubię podróże, książki, nowe technologie, sport i organizację wydarzeń.",
+        aboutTitle: "O programie",
+        aboutText1: "Konwerter planu zajęć umożliwia transformację harmonogramu w formacie Excel do pliku kalendarza (.ics).",
+        aboutText2: "Program obsługuje pliki w formacie XLS/XLSX z kolumnami: daty rozpoczęcia i zakończenia, nazwa przedmiotu, grupa, wykładowca i sala.",
+        aboutText3: "Automatycznie rozpoznaje zajęcia odbywające się na platformie Microsoft Teams.",
+        aboutText4: "Wersja 1.0 | © 2023",
         linkedinText: "Profil LinkedIn",
-        fileInfo: "Oczekiwany format: Plik Excel z kolumnami dla daty/czasu, przedmiotu, grupy, wykładowcy itp."
+        fileInfo: "Oczekiwany format: Plik Excel z danymi planu zajęć"
       },
       uk: {
         fileLabel: "Виберіть файл з розкладом:",
         convertText: "Конвертувати в Календар",
         downloadText: "Завантажити файл ICS",
         noFileError: "Будь ласка, виберіть файл",
-        invalidFileError: "Вибраний файл не є валідним файлом Excel з розкладом",
+        invalidFileError: "Вибраний файл не є валідним файлом з розкладом",
         fileError: "Помилка обробки файлу: ",
         loadingText: "Обробка вашого розкладу...",
-        aboutTitle: "Про мене",
-        aboutText1: "Я маркетолог із досвідом в офісному адмініструванні, техпідтримці та продуктовому маркетингу.",
-        aboutText2: "Моя робота — підтримка запусків, створення матеріалів та покращення контенту з Power BI, Excel, SAP та Power Platform.",
-        aboutText3: "Розмовляю українською, польською, англійською та німецькою, вивчаю іспанську і китайську.",
-        aboutText4: "Позаробочий час люблю подорожі, читання, технології, спорт і організацію подій.",
+        aboutTitle: "Про програму",
+        aboutText1: "Конвертер розкладу занять, який перетворює файли Excel у формат календаря (.ics).",
+        aboutText2: "Підтримує файли XLS/XLSX з колонками: дати початку та завершення, назва предмету, група, викладач і аудиторія.",
+        aboutText3: "Автоматично розпізнає заняття, що проводяться на платформі Microsoft Teams.",
+        aboutText4: "Версія 1.0 | © 2023",
         linkedinText: "Профіль LinkedIn",
-        fileInfo: "Очікуваний формат: Файл Excel з колонками для дати/часу, предмету, групи, викладача тощо."
+        fileInfo: "Очікуваний формат: Файл Excel з даними розкладу"
       }
     };
 
@@ -272,31 +272,17 @@
     function formatDate(dateStr) {
       if (!dateStr) return '';
       
-      // Try to parse as Date object first
+      // Special handling for Polish date format (DD.MM.YYYY HH:mm)
+      const plMatch = dateStr.toString().match(/(\d{2})\.(\d{2})\.(\d{4}) (\d{2}):(\d{2})/);
+      if (plMatch) {
+        const [_, day, month, year, hour, minute] = plMatch;
+        return `${year}${month}${day}T${hour}${minute}00`;
+      }
+      
+      // Try to parse as Date object
       const date = new Date(dateStr);
       if (!isNaN(date.getTime())) {
         return date.toISOString().replace(/[-:]/g, '').replace('.000', '');
-      }
-      
-      // Try to parse common string formats
-      const formats = [
-        // DD.MM.YYYY HH:mm
-        /(\d{2})\.(\d{2})\.(\d{4}) (\d{2}):(\d{2})/,
-        // MM/DD/YYYY HH:mm
-        /(\d{2})\/(\d{2})\/(\d{4}) (\d{2}):(\d{2})/,
-        // YYYY-MM-DD HH:mm
-        /(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2})/
-      ];
-      
-      for (const format of formats) {
-        const match = dateStr.toString().match(format);
-        if (match) {
-          const [_, part1, part2, year, hour, minute] = match;
-          // Determine if part1 is day or month based on the format
-          const day = format === formats[1] ? part2 : part1; // For MM/DD/YYYY format
-          const month = format === formats[1] ? part1 : part2;
-          return `${year}${month}${day}T${hour}${minute}00`;
-        }
       }
       
       return '';
@@ -311,13 +297,16 @@
     }
 
     function validateExcelHeaders(headers) {
-      // Check if the headers contain expected columns (case insensitive)
-      const requiredColumns = ['date', 'time', 'subject', 'group', 'lecturer'];
-      const lowerHeaders = headers.map(h => h.toLowerCase());
+      // Check for required Polish column names
+      const requiredColumns = [
+        'data rozpoczęcia',
+        'data zakończenia',
+        'nazwa pełna przedmiotu'
+      ];
       
+      const lowerHeaders = headers.map(h => String(h).toLowerCase());
       return requiredColumns.every(col => 
-        lowerHeaders.includes(col) || 
-        lowerHeaders.some(h => h.includes(col))
+        lowerHeaders.some(h => h.includes(col.toLowerCase()))
       );
     }
 
@@ -361,41 +350,37 @@
           
           let ics = `BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//Class Schedule Converter//EN\nCALSCALE:GREGORIAN\n`;
           
-          // Add timezone information
+          // Add timezone information (Europe/Warsaw)
           ics += `BEGIN:VTIMEZONE\nTZID:Europe/Warsaw\nBEGIN:STANDARD\nDTSTART:19701025T030000\nTZOFFSETFROM:+0200\nTZOFFSETTO:+0100\nTZNAME:CET\nEND:STANDARD\nBEGIN:DAYLIGHT\nDTSTART:19700329T020000\nTZOFFSETFROM:+0100\nTZOFFSETTO:+0200\nTZNAME:CEST\nEND:DAYLIGHT\nEND:VTIMEZONE\n`;
           
           for (let i = 1; i < json.length; i++) {
             const row = json[i];
-            if (!row || row.length < 4) continue;
+            if (!row || row.length < 10) continue;
             
-            // Try to find columns by name or position
-            const startDate = row[headers.findIndex(h => h.toLowerCase().includes('date'))] || row[0];
-            const startTime = row[headers.findIndex(h => h.toLowerCase().includes('time'))] || row[1];
-            const summary = row[headers.findIndex(h => h.toLowerCase().includes('subject'))] || row[2];
-            const group = row[headers.findIndex(h => h.toLowerCase().includes('group'))] || row[3];
-            const lecturer = row[headers.findIndex(h => h.toLowerCase().includes('lecturer'))] || (row.length > 4 ? row[4] : '');
-            const room = row[headers.findIndex(h => h.toLowerCase().includes('room') || h.toLowerCase().includes('location'))] || (row.length > 5 ? row[5] : '');
-            
-            // Combine date and time if they're separate
-            const start = formatDate(startDate + ' ' + startTime);
-            const end = formatDate(startDate + ' ' + (row[headers.findIndex(h => h.toLowerCase().includes('end time'))] || startTime));
+            // Map columns according to Polish Excel structure
+            const start = formatDate(row[0]); // Column A - data rozpoczęcia
+            const end = formatDate(row[1]);   // Column B - data zakończenia
+            const summary = row[3];          // Column D - nazwa pełna przedmiotu
+            const group = row[4] || row[5];  // Column E or F - grupa tematyczna/zajęciowa
+            const lecturer = row[6];         // Column G - wykładowcy
+            const room = row[9] || '';       // Column J - sala
             
             if (!start || !summary) continue;
-            
+
             const description = escapeIcalText([
-              group && `Group: ${group}`,
-              lecturer && `Lecturer: ${lecturer}`,
-              room && `Room: ${room}`
+              group && `Grupa: ${group}`,
+              lecturer && `Wykładowca: ${lecturer}`
             ].filter(Boolean).join("\\n"));
-            
-            ics += `BEGIN:VEVENT\nDTSTART;TZID=Europe/Warsaw:${start}\n`;
-            if (end) {
-              ics += `DTEND;TZID=Europe/Warsaw:${end}\n`;
-            }
+
+            // Handle Teams meetings specially
+            const location = room.includes('Teams') ? 'Microsoft Teams' : room;
+
+            ics += `BEGIN:VEVENT\n`;
+            ics += `DTSTART;TZID=Europe/Warsaw:${start}\n`;
+            ics += `DTEND;TZID=Europe/Warsaw:${end}\n`;
             ics += `SUMMARY:${escapeIcalText(summary)}\n`;
-            if (description) {
-              ics += `DESCRIPTION:${description}\n`;
-            }
+            if (description) ics += `DESCRIPTION:${description}\n`;
+            if (location) ics += `LOCATION:${escapeIcalText(location)}\n`;
             ics += `UID:${Date.now()}-${i}@scheduleconverter\n`;
             ics += `END:VEVENT\n`;
           }
@@ -435,9 +420,8 @@
 
     // Initialize the app
     window.onload = () => {
-      // Set language based on browser preference
-      const userLang = navigator.language.slice(0, 2);
-      document.getElementById("languageSelect").value = ['en', 'pl', 'uk'].includes(userLang) ? userLang : 'en';
+      // Set Polish as default language
+      document.getElementById("languageSelect").value = 'pl';
       setLanguage();
       
       // Set up file input change listener
@@ -445,9 +429,12 @@
         const file = e.target.files[0];
         const fileInfo = document.getElementById("fileInfo");
         const convertBtn = document.getElementById("convertBtn");
+        const errorElement = document.getElementById("fileError");
+        
+        errorElement.style.display = 'none';
         
         if (file) {
-          fileInfo.textContent = `Selected: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+          fileInfo.textContent = `Wybrano: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
           convertBtn.disabled = false;
         } else {
           fileInfo.textContent = '';
