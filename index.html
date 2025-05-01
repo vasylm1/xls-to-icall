@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>All-in-One Toolkit</title>
+  <title>Class Schedule Converter</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
@@ -25,7 +25,7 @@
     }
     
     .container {
-      max-width: 1200px;
+      max-width: 800px;
       margin: 0 auto;
       padding: 2rem;
     }
@@ -63,54 +63,12 @@
       font-size: 1rem;
     }
     
-    .tool-nav {
-      display: flex;
-      gap: 0.5rem;
-      flex-wrap: wrap;
-    }
-    
-    .tool-btn {
-      padding: 0.75rem 1.5rem;
-      border: none;
-      border-radius: 8px;
-      background: linear-gradient(45deg, var(--primary), var(--accent));
-      color: white;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
-    
-    .tool-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-    }
-    
-    .section {
-      display: none;
-      animation: fadeIn 0.3s ease-out;
-    }
-    
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    
-    .active {
-      display: block;
-    }
-    
     .toolbox {
       background: white;
       padding: 2rem;
       border-radius: 12px;
       box-shadow: 0 5px 25px rgba(0,0,0,0.08);
       margin-bottom: 2rem;
-    }
-    
-    .toolbox h3 {
-      color: var(--secondary);
-      margin-top: 0;
     }
     
     .form-group {
@@ -203,10 +161,6 @@
         align-items: stretch;
       }
       
-      .tool-nav {
-        justify-content: center;
-      }
-      
       .toolbox {
         padding: 1.5rem;
       }
@@ -215,14 +169,9 @@
 </head>
 <body>
   <div class="container">
-    <h1 id="mainTitle">🌐 All-in-One Toolkit</h1>
+    <h1 id="mainTitle">📅 Class Schedule Converter</h1>
     
     <div class="nav-container">
-      <div class="tool-nav">
-        <button onclick="showSection('schedule')" class="tool-btn" id="btnSchedule">📅 Schedule Converter</button>
-        <button onclick="showSection('about')" class="tool-btn" id="btnAbout">👤 About</button>
-      </div>
-      
       <div class="language-picker">
         <label id="languageLabel">🌍 Language:</label>
         <select id="languageSelect" onchange="setLanguage()">
@@ -235,36 +184,28 @@
       </div>
     </div>
 
-    <!-- Schedule Converter Section -->
-    <div id="schedule" class="section active">
-      <h2 id="scheduleTitle">📅 Class Schedule Converter</h2>
-      <div class="toolbox">
-        <div class="form-group">
-          <label for="fileInput" id="fileLabel">Select your Excel file:</label>
-          <input type="file" id="fileInput" class="form-control" accept=".xls,.xlsx">
-        </div>
-        
-        <button onclick="convertToIcs()" class="btn btn-block" id="convertBtn">
-          <i class="fas fa-exchange-alt"></i> Convert to ICS
-        </button>
-        
-        <a id="downloadLink" class="btn btn-success btn-block" style="display: none;">
-          <i class="fas fa-download"></i> <span id="downloadText">Download ICS Calendar</span>
-        </a>
+    <div class="toolbox">
+      <div class="form-group">
+        <label for="fileInput" id="fileLabel">Select your schedule file:</label>
+        <input type="file" id="fileInput" class="form-control" accept=".xls,.xlsx">
       </div>
+      
+      <button onclick="convertToIcs()" class="btn btn-block" id="convertBtn">
+        <i class="fas fa-exchange-alt"></i> <span id="convertText">Convert to Calendar</span>
+      </button>
+      
+      <a id="downloadLink" class="btn btn-success btn-block" style="display: none; margin-top: 1rem;">
+        <i class="fas fa-download"></i> <span id="downloadText">Download ICS File</span>
+      </a>
     </div>
 
-    <!-- About Section -->
-    <div id="about" class="section">
-      <h2 id="aboutTitle">👤 About</h2>
-      <div class="toolbox">
-        <div class="about-content">
-          <p id="aboutText1">I'm a marketing professional with a background in office administration, technical support, and product marketing. I hold a Bachelor's degree in Marketing and am currently studying for my Master's in Marketing Management.</p>
-          <p id="aboutText2">My work centers around supporting product launches, creating and maintaining marketing assets, and improving content quality using tools like Power BI, Excel, SAP, and Power Platform. I focus on practical solutions, clear communication, and making marketing more effective through technology.</p>
-          <p id="aboutText3">I speak Ukrainian, Polish, English, and German, and I'm learning Spanish and Chinese. I enjoy working in international environments and collaborating across teams.</p>
-          <p id="aboutText4">Outside of work, I'm passionate about travel, reading, exploring technology, staying active, and organizing events. I'm always looking to grow, improve, and take on new challenges.</p>
-        </div>
-        
+    <div class="toolbox">
+      <div class="about-content">
+        <h2 id="aboutTitle">About</h2>
+        <p id="aboutText1">I'm a marketing professional with a background in office administration, technical support, and product marketing. I hold a Bachelor's degree in Marketing and am currently studying for my Master's in Marketing Management.</p>
+        <p id="aboutText2">My work centers around supporting product launches, creating and maintaining marketing assets, and improving content quality using tools like Power BI, Excel, SAP, and Power Platform. I focus on practical solutions, clear communication, and making marketing more effective through technology.</p>
+        <p id="aboutText3">I speak Ukrainian, Polish, English, and German, and I'm learning Spanish and Chinese. I enjoy working in international environments and collaborating across teams.</p>
+        <p id="aboutText4">Outside of work, I'm passionate about travel, reading, exploring technology, staying active, and organizing events. I'm always looking to grow, improve, and take on new challenges.</p>
         <a href="https://www.linkedin.com/in/vasyl-madei-399488247/" target="_blank" class="social-link">
           <i class="fab fa-linkedin"></i>
           <span id="linkedinText">LinkedIn Profile</span>
@@ -274,126 +215,95 @@
   </div>
 
   <script>
-    // Comprehensive translations
+    // Translations
     const translations = {
       en: {
-        mainTitle: "🌐 All-in-One Toolkit",
+        mainTitle: "📅 Class Schedule Converter",
         languageLabel: "🌍 Language:",
-        btnSchedule: "📅 Schedule Converter",
-        btnAbout: "👤 About",
-        scheduleTitle: "📅 Class Schedule Converter",
-        fileLabel: "Select your Excel file:",
-        convertBtn: "Convert to ICS",
-        downloadText: "Download ICS Calendar",
-        aboutTitle: "About Me",
+        fileLabel: "Select your schedule file:",
+        convertText: "Convert to Calendar",
+        downloadText: "Download ICS File",
+        aboutTitle: "About",
         aboutText1: "I'm a marketing professional with a background in office administration, technical support, and product marketing. I hold a Bachelor's degree in Marketing and am currently studying for my Master's in Marketing Management.",
         aboutText2: "My work centers around supporting product launches, creating and maintaining marketing assets, and improving content quality using tools like Power BI, Excel, SAP, and Power Platform. I focus on practical solutions, clear communication, and making marketing more effective through technology.",
         aboutText3: "I speak Ukrainian, Polish, English, and German, and I'm learning Spanish and Chinese. I enjoy working in international environments and collaborating across teams.",
         aboutText4: "Outside of work, I'm passionate about travel, reading, exploring technology, staying active, and organizing events. I'm always looking to grow, improve, and take on new challenges.",
         linkedinText: "LinkedIn Profile",
-        noFileError: "Please upload an Excel file first",
+        noFileError: "Please select a file first",
         fileError: "Error processing file: "
       },
       pl: {
-        mainTitle: "🌐 Zestaw narzędzi",
+        mainTitle: "📅 Konwerter Planu Zajęć",
         languageLabel: "🌍 Język:",
-        btnSchedule: "📅 Konwerter planu zajęć",
-        btnAbout: "👤 O mnie",
-        scheduleTitle: "📅 Konwerter planu zajęć",
-        fileLabel: "Wybierz plik Excel:",
-        convertBtn: "Konwertuj do ICS",
-        downloadText: "Pobierz kalendarz ICS",
+        fileLabel: "Wybierz plik z planem zajęć:",
+        convertText: "Konwertuj do Kalendarza",
+        downloadText: "Pobierz plik ICS",
         aboutTitle: "O mnie",
         aboutText1: "Jestem specjalistą ds. marketingu z doświadczeniem w administracji biurowej, wsparciu technicznym oraz marketingu produktowym. Posiadam tytuł licencjata z marketingu i obecnie kontynuuję studia magisterskie na kierunku Zarządzanie Marketingiem.",
         aboutText2: "Moja praca koncentruje się na wsparciu wprowadzania produktów na rynek, tworzeniu i utrzymywaniu materiałów marketingowych oraz poprawie jakości treści przy użyciu narzędzi takich jak Power BI, Excel, SAP i Power Platform. Skupiam się na praktycznych rozwiązaniach, jasnej komunikacji i zwiększaniu efektywności marketingu poprzez technologię.",
         aboutText3: "Posługuję się językiem ukraińskim, polskim, angielskim i niemieckim, a obecnie uczę się również hiszpańskiego i chińskiego. Cenię sobie pracę w międzynarodowym środowisku i współpracę międzyzespołową.",
         aboutText4: "Poza pracą pasjonuję się podróżami, czytaniem, nowymi technologiami, aktywnym stylem życia oraz organizacją wydarzeń. Zawsze dążę do rozwoju, samodoskonalenia i podejmowania nowych wyzwań.",
         linkedinText: "Profil LinkedIn",
-        noFileError: "Najpierw prześlij plik Excel",
+        noFileError: "Proszę wybrać plik",
         fileError: "Błąd przetwarzania pliku: "
       },
       uk: {
-        mainTitle: "🌐 Універсальний набір інструментів",
+        mainTitle: "📅 Конвертер Розкладу Занять",
         languageLabel: "🌍 Мова:",
-        btnSchedule: "📅 Конвертер розкладу",
-        btnAbout: "👤 Про мене",
-        scheduleTitle: "📅 Конвертер розкладу занять",
-        fileLabel: "Виберіть файл Excel:",
-        convertBtn: "Конвертувати в ICS",
-        downloadText: "Завантажити календар ICS",
+        fileLabel: "Виберіть файл з розкладом:",
+        convertText: "Конвертувати в Календар",
+        downloadText: "Завантажити файл ICS",
         aboutTitle: "Про мене",
         aboutText1: "Я маркетолог із досвідом у сфері офісного адміністрування, технічної підтримки та продуктового маркетингу. Маю ступінь бакалавра з маркетингу та наразі здобуваю магістерську освіту за спеціальністю «Маркетинговий менеджмент».",
         aboutText2: "Моя робота зосереджена на підтримці запусків продуктів, створенні та супроводі маркетингових матеріалів, а також на покращенні якості контенту за допомогою інструментів, таких як Power BI, Excel, SAP та Power Platform. Я роблю акцент на практичних рішеннях, чіткому спілкуванні та підвищенні ефективності маркетингу через технології.",
         aboutText3: "Володію українською, польською, англійською та німецькою мовами, а також вивчаю іспанську та китайську. Мені подобається працювати в міжнародному середовищі та співпрацювати з різними командами.",
         aboutText4: "У вільний час захоплююся подорожами, читанням, новими технологіями, спортом і організацією заходів. Я завжди прагну до саморозвитку, вдосконалення та нових викликів.",
         linkedinText: "Профіль LinkedIn",
-        noFileError: "Будь ласка, спочатку завантажте файл Excel",
+        noFileError: "Будь ласка, виберіть файл",
         fileError: "Помилка обробки файлу: "
       },
       tr: {
-        mainTitle: "🌐 Tümü Bir Arada Araç Seti",
+        mainTitle: "📅 Ders Programı Dönüştürücü",
         languageLabel: "🌍 Dil:",
-        btnSchedule: "📅 Ders Programı Dönüştürücü",
-        btnAbout: "👤 Hakkımda",
-        scheduleTitle: "📅 Ders Programı Dönüştürücü",
-        fileLabel: "Excel dosyası seçin:",
-        convertBtn: "ICS'ye Dönüştür",
-        downloadText: "ICS Takvimini İndir",
+        fileLabel: "Ders programı dosyası seçin:",
+        convertText: "Takvime Dönüştür",
+        downloadText: "ICS Dosyasını İndir",
         aboutTitle: "Hakkımda",
         aboutText1: "Ofis yönetimi, teknik destek ve ürün pazarlama geçmişine sahip bir pazarlama profesyoneliyim. Pazarlama alanında lisans derecesine sahibim ve şu anda Pazarlama Yönetimi alanında yüksek lisans yapmaktayım.",
         aboutText2: "Çalışmalarım, ürün lansmanlarını desteklemeye, pazarlama materyalleri oluşturmaya ve Power BI, Excel, SAP ve Power Platform gibi araçları kullanarak içerik kalitesini artırmaya odaklanıyor. Pratik çözümler, net iletişim ve teknoloji yoluyla pazarlamayı daha etkili hale getirmeye önem veriyorum.",
         aboutText3: "Ukraynaca, Lehçe, İngilizce ve Almanca biliyorum ve şu anda İspanyolca ve Çince öğreniyorum. Uluslararası ortamlarda çalışmayı ve ekipler arası işbirliğini seviyorum.",
         aboutText4: "İş dışında seyahat etmek, okumak, teknolojiyi keşfetmek, aktif kalmak ve etkinlikler düzenlemek benim tutkularım arasında. Sürekli olarak kendimi geliştirmeye, iyileştirmeye ve yeni zorluklar üstlenmeye hevesliyim.",
         linkedinText: "LinkedIn Profili",
-        noFileError: "Lütfen önce bir Excel dosyası yükleyin",
+        noFileError: "Lütfen bir dosya seçin",
         fileError: "Dosya işleme hatası: "
       },
       az: {
-        mainTitle: "🌐 Hər şey Bir Alətdə",
+        mainTitle: "📅 Dərs Cədvəli Konvertoru",
         languageLabel: "🌍 Dil:",
-        btnSchedule: "📅 Dərs Cədvəli Konvertoru",
-        btnAbout: "👤 Haqqımda",
-        scheduleTitle: "📅 Dərs Cədvəli Konvertoru",
-        fileLabel: "Excel faylını seçin:",
-        convertBtn: "ICS-ə çevir",
-        downloadText: "ICS Təqvimini Yüklə",
+        fileLabel: "Dərs cədvəli faylını seçin:",
+        convertText: "Təqvimə çevir",
+        downloadText: "ICS Faylını Yüklə",
         aboutTitle: "Haqqımda",
         aboutText1: "Ofis administrasiyası, texniki dəstək və məhsul marketinqi təcrübəsi olan marketinq peşəkaran. Marketinq üzrə bakalavr dərəcəsinə sahibəm və hazırda Marketinq Menecmenti üzrə magistr təhsili alıram.",
         aboutText2: "İşim məhsul buraxılışlarını dəstəkləmək, marketinq materialları yaratmaq və Power BI, Excel, SAP və Power Platform kimi alətlərdən istifadə edərək məzmun keyfiyyətini yaxşılaşdırmaq üzərində cəmlənib. Praktik həllər, aydın ünsiyyət və texnologiya vasitəsilə marketinqi daha effektiv etməyə diqqət yetirirəm.",
         aboutText3: "Ukrayna, polyak, ingilis və alman dillərində danışıram və hazırda ispan və çin dillərini öyrənirəm. Beynəlxalq mühitdə işləməyi və komandalar arasında əməkdaşlıq etməyi sevirəm.",
         aboutText4: "İşdən kənarda səyahət, oxumaq, texnologiyaları araşdırmaq, fəal qalmaq və tədbirlər təşkil etmək maraqlarımdır. Daim inkişaf etməyə, özümü təkmilləşdirməyə və yeni çağırışlar qəbul etməyə çalışıram.",
         linkedinText: "LinkedIn Profili",
-        noFileError: "Zəhmət olmasa əvvəlcə Excel faylı yükləyin",
+        noFileError: "Zəhmət olmasa bir fayl seçin",
         fileError: "Fayl emalı xətası: "
       }
     };
 
-    // Show the selected section
-    function showSection(id) {
-      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-      document.getElementById(id).classList.add('active');
-    }
-
-    // Set language for all UI elements
+    // Set language
     function setLanguage() {
       const lang = document.getElementById("languageSelect").value;
       const t = translations[lang];
       
-      // Update main elements
       document.getElementById("mainTitle").textContent = t.mainTitle;
       document.getElementById("languageLabel").textContent = t.languageLabel;
-      
-      // Update buttons
-      document.getElementById("btnSchedule").textContent = t.btnSchedule;
-      document.getElementById("btnAbout").textContent = t.btnAbout;
-      
-      // Update Schedule Converter section
-      document.getElementById("scheduleTitle").textContent = t.scheduleTitle;
       document.getElementById("fileLabel").textContent = t.fileLabel;
-      document.getElementById("convertBtn").innerHTML = `<i class="fas fa-exchange-alt"></i> ${t.convertBtn}`;
+      document.getElementById("convertText").textContent = t.convertText;
       document.getElementById("downloadText").textContent = t.downloadText;
-      
-      // Update About section
       document.getElementById("aboutTitle").textContent = t.aboutTitle;
       document.getElementById("aboutText1").textContent = t.aboutText1;
       document.getElementById("aboutText2").textContent = t.aboutText2;
@@ -428,7 +338,7 @@
           let icsContent = [
             "BEGIN:VCALENDAR",
             "VERSION:2.0",
-            "PRODID:-//Schedule Converter//EN",
+            "PRODID:-//Class Schedule Converter//EN",
             "CALSCALE:GREGORIAN"
           ].join("\n");
 
@@ -437,29 +347,24 @@
             const row = json[i];
             if (!row[0]) continue; // Skip empty rows
 
-            // Map columns from your file
-            const startDate = formatDate(row[0]); // Start date (data rozpoczęcia)
-            const endDate = formatDate(row[1] || row[0]); // End date (data zakończenia)
-            const subjectCode = row[3] || ""; // Subject code (nr katalogowy przedmiotu)
-            const subjectName = row[4] || ""; // Subject name (nazwa pełna przedmiotu)
-            const group = row[6] || ""; // Group (grupa zajęciowa)
-            const lecturer = row[7] || ""; // Lecturer (wykładowcy)
-            const room = row[9] || ""; // Room (sala)
-            const status = row[10] || ""; // Status
+            // Map columns (A=0, B=1, etc.)
+            const startDate = formatDate(row[0]); // Column A: Start date (data rozpoczęcia)
+            const endDate = formatDate(row[1] || row[0]); // Column B: End date (data zakończenia)
+            const subjectName = row[4] || ""; // Column E: Event description (nazwa pełna przedmiotu)
+            
+            // Combine additional fields into comment (ignoring "godziny planowane")
+            // Columns: F=group, G=lecturer, H=stage type, I=dean's groups, J=room, K=status
+            const comment = [
+              `Group: ${row[5] || ""}`,
+              `Lecturer: ${row[6] || ""}`,
+              `Room: ${row[9] || ""}`,
+              row[10] && `Status: ${row[10]}`
+            ].filter(Boolean).join("\\n");
 
             if (!startDate) {
               console.warn(`Skipping row ${i+1}: Invalid start date`);
               continue;
             }
-
-            // Combine additional info into description
-            const description = [
-              `Subject Code: ${subjectCode}`,
-              `Group: ${group}`,
-              `Lecturer: ${lecturer}`,
-              `Room: ${room}`,
-              status && `Status: ${status}`
-            ].filter(Boolean).join("\\n");
 
             // Add event to iCal (using local time)
             icsContent += [
@@ -467,8 +372,7 @@
               `DTSTART:${startDate}`,
               `DTEND:${endDate}`,
               `SUMMARY:${escapeIcalText(subjectName)}`,
-              `DESCRIPTION:${escapeIcalText(description)}`,
-              `LOCATION:${escapeIcalText(room)}`,
+              comment && `DESCRIPTION:${escapeIcalText(comment)}`,
               "END:VEVENT"
             ].filter(Boolean).join("\n");
           }
@@ -551,7 +455,7 @@
         .replace(/\n/g, '\\n');
     }
 
-    // Initialize the page
+    // Initialize
     window.onload = function() {
       // Set browser language or default to English
       const browserLang = navigator.language.slice(0, 2);
@@ -559,8 +463,6 @@
       const defaultLang = supportedLangs.includes(browserLang) ? browserLang : 'en';
       document.getElementById("languageSelect").value = defaultLang;
       setLanguage();
-      
-      showSection('schedule'); // Show schedule converter by default
     };
   </script>
 </body>
