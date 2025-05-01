@@ -157,34 +157,9 @@
     .about-content {
       margin-bottom: 1.5rem;
     }
-    .language-picker {
-      display: flex;
-      justify-content: center;
-      gap: 0.5rem;
+    .language-selector {
       margin-bottom: 1.5rem;
-    }
-    .language-option {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.5rem 1rem;
-      border-radius: 20px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      background: var(--light);
-    }
-    .language-option:hover {
-      background: #e9ecef;
-    }
-    .language-option.active {
-      background: var(--primary);
-      color: white;
-    }
-    .flag-icon {
-      width: 20px;
-      height: 15px;
-      object-fit: cover;
-      border-radius: 2px;
+      text-align: center;
     }
   </style>
 </head>
@@ -196,19 +171,13 @@
     </div>
 
     <div id="converter" class="tab-content active" role="tabpanel" aria-labelledby="tab-converter">
-      <div class="language-picker">
-        <div class="language-option" onclick="setLanguage('en')">
-          <img src="https://flagcdn.com/w20/gb.png" class="flag-icon" alt="English">
-          <span>English</span>
-        </div>
-        <div class="language-option active" onclick="setLanguage('pl')">
-          <img src="https://flagcdn.com/w20/pl.png" class="flag-icon" alt="Polski">
-          <span>Polski</span>
-        </div>
-        <div class="language-option" onclick="setLanguage('uk')">
-          <img src="https://flagcdn.com/w20/ua.png" class="flag-icon" alt="Українська">
-          <span>Українська</span>
-        </div>
+      <div class="language-selector">
+        <label for="languageSelectConverter">🌍 Język:</label>
+        <select id="languageSelectConverter" onchange="setLanguage(this.value)">
+          <option value="en">English</option>
+          <option value="pl" selected>Polski</option>
+          <option value="uk">Українська</option>
+        </select>
       </div>
 
       <h1 id="mainTitle">📅 Konwerter Planu Zajęć AEH</h1>
@@ -233,19 +202,13 @@
     </div>
 
     <div id="about" class="tab-content" role="tabpanel" aria-labelledby="tab-about" hidden>
-      <div class="language-picker">
-        <div class="language-option" onclick="setLanguage('en')">
-          <img src="https://flagcdn.com/w20/gb.png" class="flag-icon" alt="English">
-          <span>English</span>
-        </div>
-        <div class="language-option active" onclick="setLanguage('pl')">
-          <img src="https://flagcdn.com/w20/pl.png" class="flag-icon" alt="Polski">
-          <span>Polski</span>
-        </div>
-        <div class="language-option" onclick="setLanguage('uk')">
-          <img src="https://flagcdn.com/w20/ua.png" class="flag-icon" alt="Українська">
-          <span>Українська</span>
-        </div>
+      <div class="language-selector">
+        <label for="languageSelectAbout">🌍 Język:</label>
+        <select id="languageSelectAbout" onchange="setLanguage(this.value)">
+          <option value="en">English</option>
+          <option value="pl" selected>Polski</option>
+          <option value="uk">Українська</option>
+        </select>
       </div>
 
       <h2 id="aboutTitle">O mnie</h2>
@@ -253,7 +216,7 @@
         <p id="aboutText1">Jestem specjalistą ds. marketingu z doświadczeniem w administracji biurowej, wsparciu technicznym i marketingu produktowym. Posiadam licencjat z marketingu i obecnie studiuję na magisterce z Zarządzania Marketingowego.</p>
         <p id="aboutText2">Moja praca koncentruje się na wspieraniu wprowadzania produktów na rynek, tworzeniu materiałów marketingowych oraz podnoszeniu jakości treści przy użyciu narzędzi takich jak Power BI, Excel, SAP i Power Platform. Stawiam na praktyczne rozwiązania, klarowną komunikację i zwiększanie efektywności marketingu poprzez technologie.</p>
         <p id="aboutText3">Posługuję się płynnie językiem ukraińskim, polskim, angielskim i niemieckim, a obecnie uczę się hiszpańskiego i chińskiego. Cenię sobie pracę w międzynarodowym środowisku i współpracę międzyzespołową.</p>
-        <p id="aboutText4">Poza pracą pasjonuję się podróżami, czytaniem, nowymi technologiami, aktywnym stylem życia i organizacją wydarzeń. Stale rozwijam swoje umiejętności i poszukuję nowych wyzwań zawodowych.</p>
+        <p id="aboutText4">Poza pracą pasjonuję się podróżami, czytaniem, nowymi technologiami, aktywnym stylem życia i organizacją wydarzeń. Stale rozwijam swoje umiejętności i poszukuję new challenges.</p>
       </div>
       <a href="https://www.linkedin.com/in/vasyl-madei-399488247/" target="_blank" class="btn" id="linkedinText">Profil LinkedIn</a>
       <div class="copyright">© 2025</div>
@@ -290,7 +253,7 @@
         aboutTitle: "O mnie",
         aboutText1: "Jestem specjalistą ds. marketingu z doświadczeniem w administracji biurowej, wsparciu technicznym i marketingu produktowym. Posiadam licencjat z marketingu i obecnie studiuję na magisterce z Zarządzania Marketingowego.",
         aboutText2: "Moja praca koncentruje się na wspieraniu wprowadzania produktów na rynek, tworzeniu materiałów marketingowych oraz podnoszeniu jakości treści przy użyciu narzędzi takich jak Power BI, Excel, SAP i Power Platform. Stawiam na praktyczne rozwiązania, klarowną komunikację i zwiększanie efektywności marketingu poprzez technologie.",
-        aboutText3: "Posługuję się płynnie językiem ukraińskim, polskim, angielskim i niemieckim, a obecnie uczę się hiszpańskiego i chińskiego. Cenię sobie pracę w międzynarodowym środowisku i współpracę międzyzespołową.",
+        aboutText3: "Posługuję się płynnie językiem ukraińskim, polskim, angielskim i niemieckim, a obecnie uczę się hiszpańskiego и chińskiego. Cenię sobie pracę w międzynarodowym środowisku i współpracę międzyzespołową.",
         aboutText4: "Poza pracą pasjonuję się podróżami, czytaniem, nowymi technologiami, aktywnym stylem życia i organizacją wydarzeń. Stale rozwijam swoje umiejętności i poszukuję nowych wyzwań zawodowych.",
         linkedinText: "Profil LinkedIn"
       },
@@ -329,17 +292,9 @@
     }
 
     function setLanguage(lang) {
-      // Update language select value
-      document.getElementById("languageSelect").value = lang;
-      
-      // Update active state in language pickers
-      document.querySelectorAll('.language-picker .language-option').forEach(option => {
-        option.classList.remove('active');
-      });
-      
-      document.querySelectorAll(`.language-option[onclick="setLanguage('${lang}')"]`).forEach(option => {
-        option.classList.add('active');
-      });
+      // Update both select elements
+      document.getElementById("languageSelectConverter").value = lang;
+      document.getElementById("languageSelectAbout").value = lang;
       
       // Update all text elements
       const t = translations[lang];
@@ -391,7 +346,7 @@
     }
 
     function convertToIcs() {
-      const lang = document.getElementById("languageSelect").value;
+      const lang = document.getElementById("languageSelectConverter").value;
       const t = translations[lang];
       const fileInput = document.getElementById("fileInput");
       
