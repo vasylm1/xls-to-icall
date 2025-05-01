@@ -3,262 +3,315 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>XLS to iCal Converter</title>
+  <title>Class Schedule Converter</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(to right, #fdfbfb, #ebedee);
-      margin: 0;
-      padding: 30px;
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      line-height: 1.6;
     }
-    h1 {
+    h1, h2 {
       color: #2c3e50;
-      background: #dfe9f3;
-      padding: 25px;
-      border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-      text-align: center;
     }
-    .language-picker {
-      margin-bottom: 25px;
-      text-align: center;
-    }
-    select {
-      padding: 10px 16px;
-      border-radius: 6px;
-      border: 1px solid #bbb;
-      font-size: 1em;
+    .toolbox {
       background: #f9f9f9;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-    }
-    input[type="file"] {
-      display: block;
-      margin: 25px auto;
-      padding: 12px;
-      background: #ffffff;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      width: fit-content;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      border: 1px solid #ddd;
     }
     button {
-      display: block;
-      margin: 10px auto;
-      padding: 12px 24px;
-      background-color: #2980b9;
+      background: #3498db;
       color: white;
       border: none;
-      border-radius: 6px;
+      padding: 10px 15px;
+      border-radius: 4px;
       cursor: pointer;
-      font-size: 1em;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      font-size: 16px;
     }
     button:hover {
-      background-color: #1f6391;
+      background: #2980b9;
     }
     #downloadLink {
-      display: block;
-      margin: 20px auto;
-      padding: 12px 24px;
-      background: #27ae60;
-      color: white;
-      text-decoration: none;
-      border-radius: 6px;
-      width: fit-content;
-      text-align: center;
+      display: none;
+      margin-top: 15px;
     }
-    #downloadLink:hover {
-      background: #1e8c4d;
-    }
-    footer {
-      margin-top: 50px;
-      padding-top: 20px;
-      border-top: 1px solid #ccc;
-      font-size: 0.9em;
-      color: #777;
-      text-align: center;
-    }
-    footer a {
-      color: #2980b9;
-      text-decoration: none;
-    }
-    footer a:hover {
-      text-decoration: underline;
-    }
-    .footer-icon {
-      margin-right: 8px;
-      color: #2980b9;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-      font-size: 0.95em;
-    }
-    table, th, td {
-      border: 1px solid #ccc;
-      padding: 10px;
-    }
-    table thead {
-      background-color: #dfe9f3;
+    .language-selector {
+      margin-bottom: 20px;
     }
   </style>
 </head>
 <body>
-  <h1 id="title">XLS to iCal Converter</h1>
-
-  <div class="language-picker">
-    <label for="language" id="languageLabel">Choose language:</label>
-    <select id="language" onchange="switchLanguage()">
-      <option value="en">🇬🇧 English</option>
-      <option value="pl">🇵🇱 Polski</option>
-      <option value="de">🇩🇪 Deutsch</option>
-      <option value="uk">🇺🇦 Українська</option>
-      <option value="es">🇪🇸 Español</option>
+  <div class="language-selector">
+    <select id="languageSelect" onchange="setLanguage()">
+      <option value="en">English</option>
+      <option value="pl">Polski</option>
+      <option value="uk">Українська</option>
+      <option value="tr">Türkçe</option>
+      <option value="az">Azərbaycanca</option>
     </select>
   </div>
 
-  <input type="file" id="fileInput" accept=".xls,.xlsx" />
-  <button onclick="convertToIcs()" id="convertButton">Convert to ICS</button>
-  <a id="downloadLink" style="display:none">Download ICS</a>
+  <h1 id="mainTitle">Class Schedule to iCal Converter</h1>
+  
+  <div class="toolbox">
+    <h2 id="convertTitle">Convert Schedule</h2>
+    <label id="fileLabel">Select Excel file:</label>
+    <input type="file" id="fileInput" accept=".xls,.xlsx">
+    <button onclick="convertToIcs()" id="convertBtn">Convert to iCal</button>
+    <a id="downloadLink" class="btn"></a>
+  </div>
+
+  <div class="toolbox">
+    <h2 id="aboutTitle">About</h2>
+    <p id="aboutText1">I'm a marketing professional with a background in office administration, technical support, and product marketing.</p>
+    <p id="aboutText2">My work centers around supporting product launches, creating and maintaining marketing assets.</p>
+    <a href="https://www.linkedin.com/in/vasyl-madei-399488247/" target="_blank" id="linkedinLink">LinkedIn Profile</a>
+  </div>
 
   <script>
+    // Translations
     const translations = {
       en: {
-        title: "XLS to iCal Converter",
-        convert: "Convert to ICS",
-        download: "Download ICS File",
-        chooseLang: "Choose language:"
+        mainTitle: "Class Schedule to iCal Converter",
+        convertTitle: "Convert Schedule",
+        fileLabel: "Select Excel file:",
+        convertBtn: "Convert to iCal",
+        downloadBtn: "Download ICS File",
+        aboutTitle: "About",
+        aboutText1: "I'm a marketing professional with a background in office administration, technical support, and product marketing.",
+        aboutText2: "My work centers around supporting product launches, creating and maintaining marketing assets.",
+        linkedinLink: "LinkedIn Profile",
+        noFileError: "Please select an Excel file first",
+        fileError: "Error processing file: "
       },
       pl: {
-        title: "Konwerter XLS na iCal",
-        convert: "Konwertuj do ICS",
-        download: "Pobierz plik ICS",
-        chooseLang: "Wybierz język:"
-      },
-      de: {
-        title: "XLS zu iCal Konverter",
-        convert: "In ICS umwandeln",
-        download: "ICS-Datei herunterladen",
-        chooseLang: "Sprache wählen:"
+        mainTitle: "Konwerter planu zajęć do iCal",
+        convertTitle: "Konwertuj plan",
+        fileLabel: "Wybierz plik Excel:",
+        convertBtn: "Konwertuj do iCal",
+        downloadBtn: "Pobierz plik ICS",
+        aboutTitle: "O mnie",
+        aboutText1: "Jestem specjalistą ds. marketingu z doświadczeniem w administracji biurowej, wsparciu technicznym oraz marketingu produktowym.",
+        aboutText2: "Moja praca koncentruje się na wsparciu wprowadzania produktów oraz tworzeniu materiałów marketingowych.",
+        linkedinLink: "Profil LinkedIn",
+        noFileError: "Proszę wybrać plik Excel",
+        fileError: "Błąd przetwarzania pliku: "
       },
       uk: {
-        title: "Конвертер XLS у iCal",
-        convert: "Конвертувати в ICS",
-        download: "Завантажити файл ICS",
-        chooseLang: "Виберіть мову:"
+        mainTitle: "Конвертер розкладу занять у iCal",
+        convertTitle: "Конвертувати розклад",
+        fileLabel: "Виберіть файл Excel:",
+        convertBtn: "Конвертувати в iCal",
+        downloadBtn: "Завантажити файл ICS",
+        aboutTitle: "Про мене",
+        aboutText1: "Я маркетолог із досвідом у сфері офісного адміністрування, технічної підтримки та продуктового маркетингу.",
+        aboutText2: "Моя робота зосереджена на підтримці запусків продуктів та створенні маркетингових матеріалів.",
+        linkedinLink: "Профіль LinkedIn",
+        noFileError: "Будь ласка, виберіть файл Excel",
+        fileError: "Помилка обробки файлу: "
       },
-      es: {
-        title: "Convertidor de XLS a iCal",
-        convert: "Convertir a ICS",
-        download: "Descargar archivo ICS",
-        chooseLang: "Seleccionar idioma:"
+      tr: {
+        mainTitle: "Ders Programı iCal Dönüştürücü",
+        convertTitle: "Programı Dönüştür",
+        fileLabel: "Excel dosyası seçin:",
+        convertBtn: "iCal'e Dönüştür",
+        downloadBtn: "ICS Dosyasını İndir",
+        aboutTitle: "Hakkımda",
+        aboutText1: "Ofis yönetimi, teknik destek ve ürün pazarlama geçmişine sahip bir pazarlama profesyoneliyim.",
+        aboutText2: "Çalışmalarım ürün lansmanlarını desteklemeye ve pazarlama materyalleri oluşturmaya odaklanıyor.",
+        linkedinLink: "LinkedIn Profili",
+        noFileError: "Lütfen önce bir Excel dosyası seçin",
+        fileError: "Dosya işleme hatası: "
+      },
+      az: {
+        mainTitle: "Dərs Cədvəli iCal Konvertoru",
+        convertTitle: "Cədvəli Konvert et",
+        fileLabel: "Excel faylını seçin:",
+        convertBtn: "iCal-ə çevir",
+        downloadBtn: "ICS Faylını Yüklə",
+        aboutTitle: "Haqqımda",
+        aboutText1: "Ofis administrasiyası, texniki dəstək və məhsul marketinqi təcrübəsi olan marketinq peşəkaran.",
+        aboutText2: "İşim məhsul buraxılışlarını dəstəkləmək və marketinq materialları yaratmaq üzərində cəmlənib.",
+        linkedinLink: "LinkedIn Profili",
+        noFileError: "Zəhmət olmasa əvvəlcə Excel faylı seçin",
+        fileError: "Fayl emalı xətası: "
       }
     };
 
-    function switchLanguage() {
-      const lang = document.getElementById("language").value;
-      document.getElementById("title").textContent = translations[lang].title;
-      document.getElementById("convertButton").textContent = translations[lang].convert;
-      document.getElementById("languageLabel").textContent = translations[lang].chooseLang;
-      const downloadLink = document.getElementById("downloadLink");
-      if (downloadLink.style.display !== "none") {
-        downloadLink.textContent = translations[lang].download;
-      }
+    // Set language
+    function setLanguage() {
+      const lang = document.getElementById("languageSelect").value;
+      const t = translations[lang];
+      
+      document.getElementById("mainTitle").textContent = t.mainTitle;
+      document.getElementById("convertTitle").textContent = t.convertTitle;
+      document.getElementById("fileLabel").textContent = t.fileLabel;
+      document.getElementById("convertBtn").textContent = t.convertBtn;
+      document.getElementById("downloadLink").textContent = t.downloadBtn;
+      document.getElementById("aboutTitle").textContent = t.aboutTitle;
+      document.getElementById("aboutText1").textContent = t.aboutText1;
+      document.getElementById("aboutText2").textContent = t.aboutText2;
+      document.getElementById("linkedinLink").textContent = t.linkedinLink;
     }
 
-    function detectBrowserLanguage() {
-      const userLang = navigator.language.slice(0, 2);
-      const langSelect = document.getElementById("language");
-      const supportedLangs = Object.keys(translations);
-      const defaultLang = supportedLangs.includes(userLang) ? userLang : 'en';
-      langSelect.value = defaultLang;
-      switchLanguage();
-    }
-
+    /**
+     * Converts Excel file to iCal format using local time
+     */
     function convertToIcs() {
+      const lang = document.getElementById("languageSelect").value;
+      const t = translations[lang];
       const fileInput = document.getElementById('fileInput');
+      
       if (!fileInput.files.length) {
-        alert('Please upload an XLS/XLSX file first.');
+        alert(t.noFileError);
         return;
       }
 
       const reader = new FileReader();
-      reader.onload = function (e) {
-        const data = new Uint8Array(e.target.result);
-        const workbook = XLSX.read(data, { type: 'array' });
-        const sheet = workbook.Sheets[workbook.SheetNames[0]];
-        const json = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+      reader.onload = function(e) {
+        try {
+          // Parse Excel file
+          const data = new Uint8Array(e.target.result);
+          const wb = XLSX.read(data, { type: 'array' });
+          const ws = wb.Sheets[wb.SheetNames[0]];
+          const json = XLSX.utils.sheet_to_json(ws, { header: 1 });
 
-        let icsContent = "BEGIN:VCALENDAR\nVERSION:2.0\nCALSCALE:GREGORIAN\n";
+          // Generate iCal content
+          let icsContent = [
+            "BEGIN:VCALENDAR",
+            "VERSION:2.0",
+            "PRODID:-//Class Schedule Converter//EN",
+            "CALSCALE:GREGORIAN"
+          ].join("\n");
 
-        for (let i = 1; i < json.length; i++) {
-          const row = json[i];
-          if (!row[0] || !row[1]) continue;
-          const startDate = formatDate(row[0]);
-          const endDate = formatDate(row[1]);
-          const summary = row[3] || "Class";
-          const description = (row[6] || '') + ' - ' + (row[7] || '');
-          const location = row[9] || "Online";
+          // Process each row (skip header)
+          for (let i = 1; i < json.length; i++) {
+            const row = json[i];
+            if (!row[0]) continue; // Skip empty rows
 
-          icsContent += `BEGIN:VEVENT\nSUMMARY:${summary}\nDESCRIPTION:${description}\nLOCATION:${location}\nDTSTART:${startDate}\nDTEND:${endDate}\nEND:VEVENT\n`;
+            // Map columns (same order as your file)
+            const startDate = formatDate(row[0]); // Start date
+            const endDate = formatDate(row[1] || row[0]); // End date
+            const subjectCode = row[3] || ""; // Subject code
+            const subjectName = row[4] || ""; // Subject name
+            const group = row[6] || ""; // Group
+            const lecturer = row[7] || ""; // Lecturer
+            const room = row[9] || ""; // Room
+            const status = row[10] || ""; // Status
+
+            if (!startDate) {
+              console.warn(`Skipping row ${i+1}: Invalid start date`);
+              continue;
+            }
+
+            // Combine additional info into description
+            const description = [
+              `Subject Code: ${subjectCode}`,
+              `Group: ${group}`,
+              `Lecturer: ${lecturer}`,
+              `Room: ${room}`,
+              status && `Status: ${status}`
+            ].filter(Boolean).join("\\n");
+
+            // Add event to iCal (using local time)
+            icsContent += [
+              "\nBEGIN:VEVENT",
+              `DTSTART:${startDate}`,
+              `DTEND:${endDate}`,
+              `SUMMARY:${escapeIcalText(subjectName)}`,
+              `DESCRIPTION:${escapeIcalText(description)}`,
+              `LOCATION:${escapeIcalText(room)}`,
+              "END:VEVENT"
+            ].filter(Boolean).join("\n");
+          }
+
+          icsContent += "\nEND:VCALENDAR";
+
+          // Create download link
+          const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+          const link = document.getElementById('downloadLink');
+          link.href = URL.createObjectURL(blob);
+          link.download = 'class_schedule.ics';
+          link.style.display = 'inline-block';
+          link.textContent = t.downloadBtn;
+        } catch (error) {
+          alert(t.fileError + error.message);
+          console.error(error);
         }
-
-        icsContent += "END:VCALENDAR";
-
-        const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
-        const link = document.getElementById('downloadLink');
-        link.href = URL.createObjectURL(blob);
-        link.download = 'calendar.ics';
-        const lang = document.getElementById("language").value;
-        link.textContent = translations[lang].download;
-        link.style.display = 'block';
+      };
+      reader.onerror = function() {
+        alert(t.fileError);
       };
       reader.readAsArrayBuffer(fileInput.files[0]);
     }
 
-    function formatDate(str) {
-      const parts = str.toString().match(/\d{2}\.\d{2}\.\d{4} \d{2}:\d{2}/);
-      if (!parts) return '';
-      const [day, month, year, hour, min] = parts[0].split(/\.| |:/);
-      return `${year}${month}${day}T${hour}${min}00`;
+    /**
+     * Formats date for iCal in local time (YYYYMMDDTHHMMSS)
+     * Handles multiple date formats
+     */
+    function formatDate(dateStr) {
+      if (!dateStr) return '';
+
+      let date;
+      
+      // Handle Polish date format: "DD.MM.YYYY HH:mm"
+      if (typeof dateStr === 'string') {
+        const polishDate = dateStr.match(/(\d{2})\.(\d{2})\.(\d{4}) (\d{2}):(\d{2})/);
+        if (polishDate) {
+          const [_, day, month, year, hours, minutes] = polishDate;
+          date = new Date(`${year}-${month}-${day}T${hours}:${minutes}:00`);
+        } else {
+          // Fallback to JS Date parsing
+          date = new Date(dateStr);
+        }
+      }
+      // Handle Excel serial numbers
+      else if (typeof dateStr === 'number') {
+        date = new Date((dateStr - 25569) * 86400 * 1000);
+      }
+      // Handle JS Date objects
+      else if (dateStr instanceof Date) {
+        date = dateStr;
+      }
+
+      // Validate
+      if (!date || isNaN(date.getTime())) {
+        console.warn('Invalid date format:', dateStr);
+        return '';
+      }
+
+      // Format in local time (no UTC conversion)
+      const pad = n => n.toString().padStart(2, '0');
+      return [
+        date.getFullYear(),
+        pad(date.getMonth() + 1),
+        pad(date.getDate()),
+        'T',
+        pad(date.getHours()),
+        pad(date.getMinutes()),
+        pad(date.getSeconds())
+      ].join('');
     }
 
-    window.onload = detectBrowserLanguage;
+    /**
+     * Escapes text for iCal
+     */
+    function escapeIcalText(text) {
+      return String(text)
+        .replace(/\\/g, '\\\\')
+        .replace(/,/g, '\\,')
+        .replace(/;/g, '\\;')
+        .replace(/\n/g, '\\n');
+    }
+
+    // Initialize
+    window.onload = function() {
+      setLanguage(); // Set default language
+    };
   </script>
-
-  <footer>
-    <p>Created by <strong>Vasyl Madei</strong></p>
-    <p><i class="fab fa-linkedin footer-icon"></i><a href="https://www.linkedin.com/in/vasyl-madei-399488247/" target="_blank">Vasyl Madei</a></p>
-  </footer>
-
-  <!-- How to Use Section -->
-  <section style="margin-top: 60px; background: #f0f4f8; padding: 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
-    <h2 style="text-align:center; color:#2c3e50;">\How to Use</h2>
-    <p>Prepare your Excel file (.xls or .xlsx) with the following structure:</p>
-    <table>
-      <thead>
-        <tr>
-          <th>Start Date</th><th>End Date</th><th>Title</th><th>Description</th><th>Room</th><th>Location</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>05.04.2025 09:00</td><td>05.04.2025 10:30</td><td>Project Kickoff</td><td>Initial Meeting</td><td>Conf Room A</td><td>HQ - Warsaw</td>
-        </tr>
-      </tbody>
-    </table>
-    <p style="margin-top: 20px;">
-      <strong>Notes:</strong>
-      <ul style="line-height: 1.6; margin-left: 20px;">
-        <li><code>Start Date</code> and <code>End Date</code> must be in format <strong>dd.mm.yyyy hh:mm</strong></li>
-        <li><code>Title</code> is optional (defaults to "Class")</li>
-        <li><code>Description</code> and <code>Room</code> are optional (joined together)</li>
-        <li><code>Location</code> is optional (defaults to "Online")</li>
-        <li>Only the <strong>first sheet</strong> of your Excel file is used</li>
-      </ul>
-    </p>
-  </section>
 </body>
 </html>
