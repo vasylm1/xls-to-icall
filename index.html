@@ -38,7 +38,6 @@
       cursor: pointer;
       font-weight: bold;
       box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      transition: all 0.3s ease;
     }
     .tab.active {
       background: var(--primary);
@@ -49,11 +48,6 @@
     }
     .tab-content.active {
       display: block;
-      animation: fadeIn 0.3s ease-in;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
     }
     h1, h2 {
       background: linear-gradient(45deg, var(--primary), var(--secondary));
@@ -217,23 +211,26 @@
       reader.onload = function(e) {
         try {
           const data = new Uint8Array(e.target.result);
-          const workbook = XLSX.read(data, { type: 'array' });
-          const sheet = workbook.Sheets[workbook.SheetNames[0]];
-          const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+          const wb = XLSX.read(data, { type: 'array' });
+          const ws = wb.Sheets[wb.SheetNames[0]];
+          const json = XLSX.utils.sheet_to_json(ws, { header: 1 });
 
           let ics = `BEGIN:VCALENDAR\\nVERSION:2.0\\nCALSCALE:GREGORIAN`;
-          for (let i = 1; i < rows.length; i++) {
-            const row = rows[i];
+          for (let i = 1; i < json.length; i++) {
+            const row = json[i];
             const start = formatDate(row[0]);
             const end = formatDate(row[1] || row[0]);
-            const summary = escapeIcalText(row[4] || "");
+            const summary = escapeIcalText(row[3] || "");  // D column (index 3)
             const description = escapeIcalText([
-              `Group: ${row[6] || ""}`,
-              `Lecturer: ${row[7] || ""}`,
-              `Room: ${row[9] || ""}`,
-              row[10] ? `Status: ${row[10]}` : ""
+              row[4] && `Group: ${row[4]}`,
+              row[5] && `Lecturer: ${row[5]}`,
+              row[6] && `Form: ${row[6]}`,
+              row[7] && `Dean Group: ${row[7]}`,
+              row[8] && `Note: ${row[8]}`,
+              row[9] && `Room: ${row[9]}`
             ].filter(Boolean).join("\\n"));
-            if (start && end) {
+
+            if (start && end && summary) {
               ics += `\\nBEGIN:VEVENT\\nDTSTART:${start}\\nDTEND:${end}\\nSUMMARY:${summary}\\nDESCRIPTION:${description}\\nEND:VEVENT`;
             }
           }
