@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Konwerter Planu Zajęć AEH</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -161,6 +161,16 @@
       margin-bottom: 1.5rem;
       text-align: center;
     }
+    .debug-info {
+      font-family: monospace;
+      background: #f0f0f0;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-top: 1rem;
+      max-height: 200px;
+      overflow-y: auto;
+      display: none;
+    }
   </style>
 </head>
 <body>
@@ -199,6 +209,11 @@
       <a id="downloadLink" class="btn btn-success" download="plan_zajec.ics">
         <i class="fas fa-download"></i> <span id="downloadText">Pobierz plik ICS</span>
       </a>
+
+      <div id="debugInfo" class="debug-info"></div>
+      <button onclick="toggleDebug()" class="btn" style="margin-top: 1rem; background: #666;">
+        <i class="fas fa-bug"></i> Pokaż debug
+      </button>
     </div>
 
     <div id="about" class="tab-content" role="tabpanel" aria-labelledby="tab-about" hidden>
@@ -216,7 +231,7 @@
         <p id="aboutText1">Jestem specjalistą ds. marketingu z doświadczeniem w administracji biurowej, wsparciu technicznym i marketingu produktowym. Posiadam licencjat z marketingu i obecnie studiuję na magisterce z Zarządzania Marketingowego.</p>
         <p id="aboutText2">Moja praca koncentruje się na wspieraniu wprowadzania produktów na rynek, tworzeniu materiałów marketingowych oraz podnoszeniu jakości treści przy użyciu narzędzi takich jak Power BI, Excel, SAP i Power Platform. Stawiam na praktyczne rozwiązania, klarowną komunikację i zwiększanie efektywności marketingu poprzez technologie.</p>
         <p id="aboutText3">Posługuję się płynnie językiem ukraińskim, polskim, angielskim i niemieckim, a obecnie uczę się hiszpańskiego i chińskiego. Cenię sobie pracę w międzynarodowym środowisku i współpracę międzyzespołową.</p>
-        <p id="aboutText4">Poza pracą pasjonuję się podróżami, czytaniem, nowymi technologiami, aktywnym stylem życia i organizacją wydarzeń. Stale rozwijam swoje umiejętności i poszukuję new challenges.</p>
+        <p id="aboutText4">Poza pracą pasjonuję się podróżami, czytaniem, nowymi technologiami, aktywnym stylem życia i organizacją wydarzeń. Stale rozwijam swoje umiejętności i poszukuję nowych wyzwań zawodowych.</p>
       </div>
       <a href="https://www.linkedin.com/in/vasyl-madei-399488247/" target="_blank" class="btn" id="linkedinText">Profil LinkedIn</a>
       <div class="copyright">© 2025</div>
@@ -253,7 +268,7 @@
         aboutTitle: "O mnie",
         aboutText1: "Jestem specjalistą ds. marketingu z doświadczeniem w administracji biurowej, wsparciu technicznym i marketingu produktowym. Posiadam licencjat z marketingu i obecnie studiuję na magisterce z Zarządzania Marketingowego.",
         aboutText2: "Moja praca koncentruje się na wspieraniu wprowadzania produktów na rynek, tworzeniu materiałów marketingowych oraz podnoszeniu jakości treści przy użyciu narzędzi takich jak Power BI, Excel, SAP i Power Platform. Stawiam na praktyczne rozwiązania, klarowną komunikację i zwiększanie efektywności marketingu poprzez technologie.",
-        aboutText3: "Posługuję się płynnie językiem ukraińskim, polskim, angielskim i niemieckim, a obecnie uczę się hiszpańskiego и chińskiego. Cenię sobie pracę w międzynarodowym środowisku i współpracę międzyzespołową.",
+        aboutText3: "Posługuję się płynnie językiem ukraińskim, polskim, angielskim i niemieckim, a obecnie uczę się hiszpańskiego i chińskiego. Cenię sobie pracę w międzynarodowym środowisku i współpracę międzyzespołową.",
         aboutText4: "Poza pracą pasjonuję się podróżami, czytaniem, nowymi technologiami, aktywnym stylem życia i organizacją wydarzeń. Stale rozwijam swoje umiejętności i poszukuję nowych wyzwań zawodowych.",
         linkedinText: "Profil LinkedIn"
       },
@@ -292,11 +307,9 @@
     }
 
     function setLanguage(lang) {
-      // Update both select elements
       document.getElementById("languageSelectConverter").value = lang;
       document.getElementById("languageSelectAbout").value = lang;
       
-      // Update all text elements
       const t = translations[lang];
       for (const key in t) {
         const el = document.getElementById(key);
@@ -307,19 +320,28 @@
     function formatDate(dateStr) {
       if (!dateStr) return '';
       
-      // Special handling for Polish date format (DD.MM.YYYY HH:mm)
-      const plMatch = dateStr.toString().match(/(\d{2})\.(\d{2})\.(\d{4}) (\d{2}):(\d{2})/);
-      if (plMatch) {
-        const [_, day, month, year, hour, minute] = plMatch;
-        return `${year}${month}${day}T${hour}${minute}00`;
+      // Handle Polish date format: "DD.MM.YYYY HH:mm"
+      if (typeof dateStr === 'string') {
+        const plMatch = dateStr.match(/(\d{2})\.(\d{2})\.(\d{4}) (\d{2}):(\d{2})/);
+        if (plMatch) {
+          const [_, day, month, year, hour, minute] = plMatch;
+          return `${year}${month}${day}T${hour}${minute}00`;
+        }
+      }
+      
+      // Handle Excel serial dates (numbers)
+      if (typeof dateStr === 'number') {
+        const date = new Date(Math.round((dateStr - 25569) * 86400 * 1000); // Excel to JS date
+        return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
       }
       
       // Try to parse as Date object
       const date = new Date(dateStr);
       if (!isNaN(date.getTime())) {
-        return date.toISOString().replace(/[-:]/g, '').replace('.000', '');
+        return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
       }
       
+      console.warn("Unrecognized date format:", dateStr);
       return '';
     }
 
@@ -332,23 +354,35 @@
     }
 
     function validateExcelHeaders(headers) {
-      // Check for required Polish column names
       const requiredColumns = [
         'data rozpoczęcia',
         'data zakończenia',
         'nazwa pełna przedmiotu'
       ];
       
-      const lowerHeaders = headers.map(h => String(h).toLowerCase());
+      const lowerHeaders = headers.map(h => String(h).toLowerCase().trim());
       return requiredColumns.every(col => 
         lowerHeaders.some(h => h.includes(col.toLowerCase()))
       );
+    }
+
+    function logDebug(message) {
+      const debugDiv = document.getElementById('debugInfo');
+      debugDiv.innerHTML += `<div>${new Date().toLocaleTimeString()}: ${message}</div>`;
+      console.log(message);
+    }
+
+    function toggleDebug() {
+      const debugDiv = document.getElementById('debugInfo');
+      debugDiv.style.display = debugDiv.style.display === 'none' ? 'block' : 'none';
     }
 
     function convertToIcs() {
       const lang = document.getElementById("languageSelectConverter").value;
       const t = translations[lang];
       const fileInput = document.getElementById("fileInput");
+      const debugDiv = document.getElementById('debugInfo');
+      debugDiv.innerHTML = '';
       
       if (!fileInput.files.length) {
         showError(t.noFileError);
@@ -373,54 +407,77 @@
           const ws = wb.Sheets[wb.SheetNames[0]];
           const json = XLSX.utils.sheet_to_json(ws, { header: 1 });
           
-          // Validate headers (first row)
           if (json.length < 2) {
             throw new Error(t.invalidFileError);
           }
           
           const headers = json[0].map(h => String(h).trim());
+          logDebug("Excel Headers: " + headers.join(', '));
+          
           if (!validateExcelHeaders(headers)) {
             throw new Error(t.invalidFileError);
           }
           
-          let ics = `BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//Class Schedule Converter//EN\nCALSCALE:GREGORIAN\n`;
-          
-          // Add timezone information (Europe/Warsaw)
+          let ics = `BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//AEH Schedule Converter//EN\nCALSCALE:GREGORIAN\n`;
           ics += `BEGIN:VTIMEZONE\nTZID=Europe/Warsaw\nBEGIN:STANDARD\nDTSTART:19701025T030000\nTZOFFSETFROM:+0200\nTZOFFSETTO:+0100\nTZNAME:CET\nEND:STANDARD\nBEGIN:DAYLIGHT\nDTSTART:19700329T020000\nTZOFFSETFROM:+0100\nTZOFFSETTO:+0200\nTZNAME:CEST\nEND:DAYLIGHT\nEND:VTIMEZONE\n`;
+          
+          let eventCount = 0;
           
           for (let i = 1; i < json.length; i++) {
             const row = json[i];
             if (!row || row.length < 10) continue;
             
-            // Map columns according to Polish Excel structure
-            const start = formatDate(row[0]); // Column A - data rozpoczęcia
-            const end = formatDate(row[1]);   // Column B - data zakończenia
-            const summary = row[3];          // Column D - nazwa pełna przedmiotu
-            const group = row[4] || row[5];  // Column E or F - grupa tematyczna/zajęciowa
-            const lecturer = row[6];         // Column G - wykładowcy
-            const room = row[9] || '';       // Column J - sala
+            // Map columns (adjust indices if needed)
+            const start = formatDate(row[0]); // A - data rozpoczęcia
+            const end = formatDate(row[1]);   // B - data zakończenia
+            const hours = row[2];             // C - godziny planowane
+            const summary = row[3];          // D - nazwa pełna przedmiotu
+            const groupThematic = row[4];     // E - grupa tematyczna
+            const groupClass = row[5];        // F - grupa zajęciowa
+            const lecturer = row[6];          // G - wykładowcy
+            const stageType = row[7];        // H - rodzaj etapu
+            const deanGroups = row[8];       // I - grupy dziekańskie
+            const room = row[9] || '';       // J - sala
             
-            if (!start || !summary) continue;
-
+            if (!start || !end || !summary) {
+              logDebug(`Skipping row ${i} (missing date/summary): ${JSON.stringify(row)}`);
+              continue;
+            }
+            
             const description = escapeIcalText([
-              group && `Grupa: ${group}`,
-              lecturer && `Wykładowca: ${lecturer}`
+              groupThematic && `Grupa tematyczna: ${groupThematic}`,
+              groupClass && `Grupa zajęciowa: ${groupClass}`,
+              lecturer && `Wykładowca: ${lecturer}`,
+              hours && `Godziny: ${hours}`,
+              stageType && `Etap: ${stageType}`,
+              deanGroups && `Grupy: ${deanGroups.toString().replace(/\n/g, ', ')}`
             ].filter(Boolean).join("\\n"));
-
-            // Handle Teams meetings specially
-            const location = room.includes('Teams') ? 'Microsoft Teams' : room;
-
+            
+            const location = room.toLowerCase().includes('teams') 
+              ? 'Microsoft Teams' 
+              : room.replace(/Teams/g, '').trim();
+            
             ics += `BEGIN:VEVENT\n`;
             ics += `DTSTART;TZID=Europe/Warsaw:${start}\n`;
             ics += `DTEND;TZID=Europe/Warsaw:${end}\n`;
             ics += `SUMMARY:${escapeIcalText(summary)}\n`;
             if (description) ics += `DESCRIPTION:${description}\n`;
             if (location) ics += `LOCATION:${escapeIcalText(location)}\n`;
-            ics += `UID:${Date.now()}-${i}@scheduleconverter\n`;
+            ics += `UID:${Date.now()}-${i}@aeh-converter\n`;
             ics += `END:VEVENT\n`;
+            
+            eventCount++;
+            logDebug(`Added event: ${summary} (${start} - ${end})`);
           }
           
           ics += `END:VCALENDAR`;
+          
+          logDebug(`Generated ICS with ${eventCount} events`);
+          console.log("ICS Content:", ics);
+          
+          if (eventCount === 0) {
+            throw new Error("No valid events found in the file");
+          }
           
           const blob = new Blob([ics], { type: 'text/calendar' });
           const link = document.getElementById('downloadLink');
@@ -428,6 +485,7 @@
           link.style.display = 'inline-block';
           
         } catch (err) {
+          logDebug(`Error: ${err.message}`);
           showError(t.fileError + err.message);
         } finally {
           loadingIndicator.style.display = 'none';
@@ -436,6 +494,7 @@
       };
       
       reader.onerror = function() {
+        logDebug(`File read error: ${reader.error}`);
         showError(t.fileError + reader.error);
         loadingIndicator.style.display = 'none';
         convertBtn.disabled = false;
@@ -455,10 +514,8 @@
 
     // Initialize the app
     window.onload = () => {
-      // Set Polish as default language
       setLanguage('pl');
       
-      // Set up file input change listener
       document.getElementById("fileInput").addEventListener('change', function(e) {
         const file = e.target.files[0];
         const fileInfo = document.getElementById("fileInfo");
