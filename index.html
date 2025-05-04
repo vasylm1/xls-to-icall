@@ -1,174 +1,289 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Konwerter Planu Zajęć AEH</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <!-- The CSS remains the same as in your original file (lines 9-164) -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Konwerter Planu Zajęć AEH</title>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --accent: #4895ef;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --error: #e63946;
+            --success: #2ecc71;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #dfe7f5 100%);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .user-info {
+            background: var(--light);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+            color: var(--dark);
+        }
+
+        h1 {
+            color: var(--primary);
+            margin: 0;
+            padding: 1rem;
+            border-radius: 12px;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: white;
+            box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
+        }
+
+        .input-section {
+            margin: 2rem 0;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--dark);
+            font-weight: 500;
+        }
+
+        input[type="file"] {
+            width: 100%;
+            padding: 1rem;
+            border: 2px dashed var(--primary);
+            border-radius: 8px;
+            background: var(--light);
+            cursor: pointer;
+            margin-bottom: 1rem;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(67, 97, 238, 0.4);
+        }
+
+        .btn:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-success {
+            background: linear-gradient(45deg, var(--success), #27ae60);
+            display: none;
+        }
+
+        .error-message {
+            color: var(--error);
+            padding: 1rem;
+            border-radius: 8px;
+            background: rgba(230, 57, 70, 0.1);
+            margin: 1rem 0;
+            display: none;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 1rem 0;
+        }
+
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: var(--primary);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .file-info {
+            margin-top: 0.5rem;
+            color: var(--dark);
+            font-size: 0.9rem;
+        }
+    </style>
 </head>
 <body>
-  <!-- The HTML structure remains the same as in your original file (lines 166-224) -->
-  
-  <script>
-    const translations = {
-      en: {
-        mainTitle: "📅 AEH Class Schedule Converter",
-        fileLabel: "Select your schedule file:",
-        convertText: "Convert to Calendar",
-        downloadText: "Download ICS File",
-        noFileError: "Please select a file first",
-        invalidFileError: "The selected file is not a valid schedule file",
-        fileError: "Error processing file: ",
-        loadingText: "Processing your schedule...",
-        fileProcessing: "Processing file...",
-        invalidFormat: "Invalid file format. Please use .xls or .xlsx files only.",
-        aboutTitle: "About Me",
-        // ... rest of English translations
-      },
-      pl: {
-        mainTitle: "📅 Konwerter Planu Zajęć AEH",
-        fileLabel: "Wybierz plik z planem zajęć:",
-        convertText: "Konwertuj do Kalendarza",
-        downloadText: "Pobierz plik ICS",
-        noFileError: "Proszę wybrać plik",
-        invalidFileError: "Wybrany plik nie jest prawidłowym plikiem z planem zajęć",
-        fileError: "Błąd przetwarzania pliku: ",
-        loadingText: "Przetwarzanie planu zajęć...",
-        fileProcessing: "Przetwarzanie pliku...",
-        invalidFormat: "Nieprawidłowy format pliku. Użyj tylko plików .xls lub .xlsx.",
-        aboutTitle: "O mnie",
-        // ... rest of Polish translations
-      },
-      uk: {
-        mainTitle: "📅 Конвертер Розкладу AEH",
-        fileLabel: "Виберіть файл з розкладом:",
-        convertText: "Конвертувати в Календар",
-        downloadText: "Завантажити файл ICS",
-        noFileError: "Будь ласка, виберіть файл",
-        invalidFileError: "Вибраний файл не є валідним файлом з розкладом",
-        fileError: "Помилка обробки файлу: ",
-        loadingText: "Обробка вашого розкладу...",
-        fileProcessing: "Обробка файлу...",
-        invalidFormat: "Невірний формат файлу. Використовуйте лише файли .xls або .xlsx.",
-        aboutTitle: "Про мене",
-        // ... rest of Ukrainian translations
-      }
-    };
+    <div class="container">
+        <div class="header">
+            <div class="user-info">
+                <div>Current User: <strong id="currentUser">vasylm1</strong></div>
+                <div>Date & Time (UTC): <strong id="currentTime">2025-05-04 07:57:42</strong></div>
+            </div>
+            <h1>📅 Konwerter Planu Zajęć AEH</h1>
+        </div>
 
-    function validateRowData(row) {
-      if (!row || !Array.isArray(row)) return false;
-      if (!row[0] || !row[1] || !row[4]) return false; // Check for required fields
-      return true;
-    }
+        <div class="input-section">
+            <label for="fileInput">Wybierz plik z planem zajęć (.xls lub .xlsx):</label>
+            <input type="file" id="fileInput" accept=".xls,.xlsx">
+            <div id="fileInfo" class="file-info"></div>
+        </div>
 
-    function formatDate(dateStr) {
-      if (!dateStr) return '';
-      
-      // Handle Excel date numbers
-      if (typeof dateStr === 'number') {
-        const date = new Date(Math.round((dateStr - 25569) * 86400 * 1000));
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-        const hour = String(date.getHours()).padStart(2, '0');
-        const minute = String(date.getMinutes()).padStart(2, '0');
-        return `${year}${month}${day}T${hour}${minute}00`;
-      }
-      
-      // Handle string dates in format DD.MM.YYYY HH:mm
-      if (typeof dateStr === 'string') {
-        const plMatch = dateStr.match(/(\d{2})\.(\d{2})\.(\d{4})\s*(\d{2}):(\d{2})/);
-        if (plMatch) {
-          const [_, day, month, year, hour, minute] = plMatch;
-          return `${year}${month}${day}T${hour}${minute}00`;
+        <button onclick="convertToIcs()" class="btn" id="convertBtn" disabled>
+            <i class="fas fa-exchange-alt"></i> Konwertuj do Kalendarza
+        </button>
+
+        <div class="loading" id="loadingIndicator">
+            <div class="spinner"></div>
+            <p>Przetwarzanie pliku...</p>
+        </div>
+
+        <div id="fileError" class="error-message"></div>
+
+        <a id="downloadLink" class="btn btn-success" download="plan_zajec.ics">
+            <i class="fas fa-download"></i> Pobierz plik ICS
+        </a>
+    </div>
+
+    <script>
+        // Update current time every second
+        function updateDateTime() {
+            const now = new Date();
+            const formatted = now.toISOString().replace('T', ' ').substring(0, 19);
+            document.getElementById('currentTime').textContent = formatted;
         }
-      }
-      
-      // Try parsing as regular date
-      const date = new Date(dateStr);
-      if (!isNaN(date.getTime())) {
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-        const hour = String(date.getHours()).padStart(2, '0');
-        const minute = String(date.getMinutes()).padStart(2, '0');
-        return `${year}${month}${day}T${hour}${minute}00`;
-      }
-      
-      return '';
-    }
+        
+        setInterval(updateDateTime, 1000);
+        updateDateTime(); // Initial update
 
-    function escapeIcalText(text) {
-      return String(text || '')
-        .replace(/\\/g, '\\\\')
-        .replace(/,/g, '\\,')
-        .replace(/;/g, '\\;')
-        .replace(/\n/g, '\\n');
-    }
+        // Initialize user info
+        document.getElementById('currentUser').textContent = 'vasylm1';
 
-    function validateExcelHeaders(headers) {
-      const requiredColumns = [
-        'data rozpoczęcia',
-        'data zakończenia',
-        'nazwa pełna przedmiotu'
-      ];
-      
-      const lowerHeaders = headers.map(h => String(h).toLowerCase().trim());
-      return requiredColumns.every(col => 
-        lowerHeaders.some(h => h.includes(col.toLowerCase()))
-      );
-    }
+        function formatDate(dateStr) {
+            if (!dateStr) return '';
+            
+            // Handle Excel date numbers
+            if (typeof dateStr === 'number') {
+                const date = new Date(Math.round((dateStr - 25569) * 86400 * 1000));
+                return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+            }
+            
+            // Handle string dates in format DD.MM.YYYY HH:mm
+            if (typeof dateStr === 'string') {
+                const plMatch = dateStr.match(/(\d{2})\.(\d{2})\.(\d{4})\s*(\d{2}):(\d{2})/);
+                if (plMatch) {
+                    const [_, day, month, year, hour, minute] = plMatch;
+                    return `${year}${month}${day}T${hour}${minute}00`;
+                }
+            }
+            
+            const date = new Date(dateStr);
+            if (!isNaN(date.getTime())) {
+                return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+            }
+            
+            return '';
+        }
 
-    function convertToIcs() {
-      const lang = document.getElementById("languageSelectConverter").value;
-      const t = translations[lang];
-      const fileInput = document.getElementById("fileInput");
-      
-      if (!fileInput.files.length) {
-        showError(t.noFileError);
-        return;
-      }
-      
-      const loadingIndicator = document.getElementById("loadingIndicator");
-      const convertBtn = document.getElementById("convertBtn");
-      const downloadLink = document.getElementById("downloadLink");
-      
-      // Hide download link and show loading
-      downloadLink.style.display = 'none';
-      loadingIndicator.style.display = 'block';
-      convertBtn.disabled = true;
-      
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        try {
-          const data = new Uint8Array(e.target.result);
-          let wb;
-          try {
-            wb = XLSX.read(data, { type: 'array' });
-          } catch (error) {
-            throw new Error(t.invalidFileError);
-          }
-          
-          if (!wb || !wb.SheetNames || wb.SheetNames.length === 0) {
-            throw new Error(t.invalidFileError);
-          }
-          
-          const ws = wb.Sheets[wb.SheetNames[0]];
-          const json = XLSX.utils.sheet_to_json(ws, { header: 1 });
-          
-          if (json.length < 2) {
-            throw new Error(t.invalidFileError);
-          }
-          
-          const headers = json[0].map(h => String(h).trim());
-          if (!validateExcelHeaders(headers)) {
-            throw new Error(t.invalidFileError);
-          }
-          
-          // Build ICS file content
-          let ics = `BEGIN:VCALENDAR
+        function escapeIcalText(text) {
+            return String(text || '')
+                .replace(/\\/g, '\\\\')
+                .replace(/,/g, '\\,')
+                .replace(/;/g, '\\;')
+                .replace(/\n/g, '\\n');
+        }
+
+        function validateExcelHeaders(headers) {
+            const requiredColumns = [
+                'data rozpoczęcia',
+                'data zakończenia',
+                'nazwa pełna przedmiotu'
+            ];
+            
+            const lowerHeaders = headers.map(h => String(h).toLowerCase().trim());
+            return requiredColumns.every(col => 
+                lowerHeaders.some(h => h.includes(col.toLowerCase()))
+            );
+        }
+
+        function convertToIcs() {
+            const fileInput = document.getElementById('fileInput');
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            const convertBtn = document.getElementById('convertBtn');
+            const downloadLink = document.getElementById('downloadLink');
+            const errorElement = document.getElementById('fileError');
+
+            if (!fileInput.files.length) {
+                showError('Proszę wybrać plik');
+                return;
+            }
+
+            // Hide download link and show loading
+            downloadLink.style.display = 'none';
+            loadingIndicator.style.display = 'block';
+            convertBtn.disabled = true;
+            errorElement.style.display = 'none';
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    
+                    if (!workbook.SheetNames.length) {
+                        throw new Error('Invalid Excel file');
+                    }
+
+                    const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const json = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+                    if (json.length < 2) {
+                        throw new Error('No data found in file');
+                    }
+
+                    const headers = json[0].map(h => String(h).trim());
+                    if (!validateExcelHeaders(headers)) {
+                        throw new Error('Invalid file format - missing required columns');
+                    }
+
+                    // Generate ICS content
+                    let ics = `BEGIN:VCALENDAR
 VERSION:2.0
 PRODID:-//AEH Schedule Converter//EN
 CALSCALE:GREGORIAN
@@ -188,141 +303,99 @@ TZOFFSETFROM:+0100
 TZOFFSETTO:+0200
 TZNAME:CEST
 END:DAYLIGHT
-END:VTIMEZONE
-`;
-          
-          for (let i = 1; i < json.length; i++) {
-            const row = json[i];
-            if (!validateRowData(row)) continue;
-            
-            const start = formatDate(row[0]);
-            const end = formatDate(row[1]);
-            const hours = row[2];
-            const summary = row[4];
-            const groupThematic = row[5];
-            const groupClass = row[6];
-            const lecturer = row[7];
-            const stageType = row[8];
-            const deanGroups = row[9];
-            const room = row[10] || '';
-            
-            if (!start || !end || !summary) continue;
+END:VTIMEZONE\n`;
 
-            const description = escapeIcalText([
-              groupThematic && `Grupa tematyczna: ${groupThematic}`,
-              groupClass && `Grupa zajęciowa: ${groupClass}`,
-              lecturer && `Wykładowca: ${lecturer}`,
-              hours && `Godziny: ${hours}`,
-              stageType && `Etap: ${stageType}`,
-              deanGroups && `Grupy: ${deanGroups.toString().replace(/\n/g, ', ')}`
-            ].filter(Boolean).join("\\n"));
-            
-            const location = room.toLowerCase().includes('teams') 
-              ? 'Microsoft Teams' 
-              : room.replace(/Teams/g, '').trim();
-            
-            ics += `BEGIN:VEVENT
+                    for (let i = 1; i < json.length; i++) {
+                        const row = json[i];
+                        if (!row || row.length < 10) continue;
+
+                        const start = formatDate(row[0]);
+                        const end = formatDate(row[1]);
+                        const summary = row[4];
+                        
+                        if (!start || !end || !summary) continue;
+
+                        const description = escapeIcalText([
+                            row[5] && `Grupa tematyczna: ${row[5]}`,
+                            row[6] && `Grupa zajęciowa: ${row[6]}`,
+                            row[7] && `Wykładowca: ${row[7]}`,
+                            row[2] && `Godziny: ${row[2]}`,
+                            row[8] && `Etap: ${row[8]}`,
+                            row[9] && `Grupy: ${row[9]}`
+                        ].filter(Boolean).join("\\n"));
+
+                        const location = (row[10] || '').toLowerCase().includes('teams') 
+                            ? 'Microsoft Teams' 
+                            : (row[10] || '').replace(/Teams/g, '').trim();
+
+                        ics += `BEGIN:VEVENT
 DTSTART;TZID=Europe/Warsaw:${start}
 DTEND;TZID=Europe/Warsaw:${end}
 SUMMARY:${escapeIcalText(summary)}
 ${description ? `DESCRIPTION:${description}\n` : ''}${location ? `LOCATION:${escapeIcalText(location)}\n` : ''}UID:${Date.now()}-${i}@aeh-converter
-END:VEVENT
-`;
-          }
-          
-          ics += 'END:VCALENDAR';
-          
-          const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
-          const link = document.getElementById('downloadLink');
-          if (link.href) {
-            URL.revokeObjectURL(link.href); // Clean up previous URL
-          }
-          link.href = URL.createObjectURL(blob);
-          link.style.display = 'inline-block';
-          
-        } catch (err) {
-          showError(t.fileError + err.message);
-        } finally {
-          loadingIndicator.style.display = 'none';
-          convertBtn.disabled = false;
+END:VEVENT\n`;
+                    }
+
+                    ics += 'END:VCALENDAR';
+
+                    const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
+                    if (downloadLink.href) {
+                        URL.revokeObjectURL(downloadLink.href);
+                    }
+                    downloadLink.href = URL.createObjectURL(blob);
+                    downloadLink.style.display = 'inline-block';
+
+                } catch (err) {
+                    showError('Error: ' + err.message);
+                } finally {
+                    loadingIndicator.style.display = 'none';
+                    convertBtn.disabled = false;
+                }
+            };
+
+            reader.onerror = function() {
+                showError('Error reading file');
+                loadingIndicator.style.display = 'none';
+                convertBtn.disabled = false;
+            };
+
+            reader.readAsArrayBuffer(fileInput.files[0]);
         }
-      };
-      
-      reader.onerror = function() {
-        showError(t.fileError + reader.error);
-        loadingIndicator.style.display = 'none';
-        convertBtn.disabled = false;
-      };
-      
-      reader.readAsArrayBuffer(fileInput.files[0]);
-    }
 
-    function showError(message) {
-      const errorElement = document.getElementById("fileError");
-      errorElement.textContent = message;
-      errorElement.style.display = 'block';
-      setTimeout(() => {
-        errorElement.style.display = 'none';
-      }, 5000);
-    }
-
-    function switchTab(tab) {
-      document.querySelectorAll('.tab').forEach(t => {
-        t.classList.remove('active');
-        t.setAttribute('aria-selected', 'false');
-      });
-      document.querySelectorAll('.tab-content').forEach(tc => {
-        tc.classList.remove('active');
-        tc.setAttribute('hidden', 'true');
-      });
-      
-      document.querySelector(`.tab[onclick="switchTab('${tab}')"]`).classList.add('active');
-      document.querySelector(`.tab[onclick="switchTab('${tab}')"]`).setAttribute('aria-selected', 'true');
-      document.getElementById(tab).classList.add('active');
-      document.getElementById(tab).removeAttribute('hidden');
-    }
-
-    function setLanguage(lang) {
-      document.getElementById("languageSelectConverter").value = lang;
-      document.getElementById("languageSelectAbout").value = lang;
-      
-      const t = translations[lang];
-      for (const key in t) {
-        const el = document.getElementById(key);
-        if (el) el.textContent = t[key];
-      }
-    }
-
-    window.onload = () => {
-      setLanguage('pl');
-      
-      document.getElementById("fileInput").addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        const fileInfo = document.getElementById("fileInfo");
-        const convertBtn = document.getElementById("convertBtn");
-        const errorElement = document.getElementById("fileError");
-        const downloadLink = document.getElementById("downloadLink");
-        const lang = document.getElementById("languageSelectConverter").value;
-        const t = translations[lang];
-        
-        errorElement.style.display = 'none';
-        downloadLink.style.display = 'none';
-        
-        if (file) {
-          const fileExtension = file.name.split('.').pop().toLowerCase();
-          if (!['xls', 'xlsx'].includes(fileExtension)) {
-            showError(t.invalidFormat);
-            convertBtn.disabled = true;
-            return;
-          }
-          fileInfo.textContent = `${t.fileLabel} ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
-          convertBtn.disabled = false;
-        } else {
-          fileInfo.textContent = '';
-          convertBtn.disabled = true;
+        function showError(message) {
+            const errorElement = document.getElementById('fileError');
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+            setTimeout(() => {
+                errorElement.style.display = 'none';
+            }, 5000);
         }
-      });
-    };
-  </script>
+
+        // File input handler
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            const fileInfo = document.getElementById('fileInfo');
+            const convertBtn = document.getElementById('convertBtn');
+            const downloadLink = document.getElementById('downloadLink');
+            const errorElement = document.getElementById('fileError');
+
+            errorElement.style.display = 'none';
+            downloadLink.style.display = 'none';
+
+            if (file) {
+                const fileExtension = file.name.split('.').pop().toLowerCase();
+                if (!['xls', 'xlsx'].includes(fileExtension)) {
+                    showError('Invalid file format. Please use .xls or .xlsx files only.');
+                    convertBtn.disabled = true;
+                    return;
+                }
+                fileInfo.textContent = `Selected: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+                convertBtn.disabled = false;
+            } else {
+                fileInfo.textContent = '';
+                convertBtn.disabled = true;
+            }
+        });
+    </script>
 </body>
 </html>
