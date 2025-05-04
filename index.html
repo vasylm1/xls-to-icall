@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="pl">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Konwerter Planu Zajęć AEH</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Class Schedule Converter</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
@@ -13,23 +13,17 @@
       --accent: #4895ef;
       --light: #f8f9fa;
       --dark: #212529;
-      --error: #e63946;
-      --success: #2ecc71;
     }
     body {
       font-family: 'Segoe UI', sans-serif;
       background: linear-gradient(135deg, #f5f7fa 0%, #dfe7f5 100%);
       margin: 0;
       padding: 0;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
     }
     .container {
       max-width: 900px;
       margin: auto;
       padding: 2rem;
-      flex: 1;
     }
     .tabs {
       display: flex;
@@ -44,10 +38,6 @@
       cursor: pointer;
       font-weight: bold;
       box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      transition: all 0.3s ease;
-    }
-    .tab:hover {
-      transform: translateY(-2px);
     }
     .tab.active {
       background: var(--primary);
@@ -58,7 +48,6 @@
     }
     .tab-content.active {
       display: block;
-      animation: fadeIn 0.5s ease;
     }
     h1, h2 {
       background: linear-gradient(45deg, var(--primary), var(--secondary));
@@ -74,18 +63,12 @@
       display: block;
     }
     input[type="file"], select {
-      padding: 0.75rem;
+      padding: 0.5rem;
       width: 100%;
       max-width: 400px;
       border: 2px solid #e9ecef;
       border-radius: 8px;
       margin-top: 0.5rem;
-      box-sizing: border-box; /* Include padding and border in element's total width */
-      transition: border 0.3s ease;
-    }
-    input[type="file"]:focus, select:focus {
-      border-color: var(--accent);
-      outline: none;
     }
     .btn {
       margin-top: 1.5rem;
@@ -97,603 +80,150 @@
       font-weight: bold;
       cursor: pointer;
       box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-      transition: all 0.3s ease;
-      display: inline-flex; /* Align icon and text */
-      align-items: center;
-      gap: 0.5rem; /* Space between icon and text */
-    }
-    .btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-    }
-    .btn:disabled {
-      background: #cccccc;
-      cursor: not-allowed;
-      transform: none;
-      box-shadow: none;
     }
     .btn-success {
-      background: linear-gradient(45deg, var(--success), #27ae60);
+      background: linear-gradient(45deg, #2ecc71, #27ae60);
       text-decoration: none;
-      display: none; /* Initially hidden */
+      display: none;
       margin-top: 1rem;
     }
-    .error-message {
-      color: var(--error);
-      background-color: #fdecea; /* Light red background */
-      border: 1px solid var(--error);
-      border-radius: 8px;
-      padding: 0.75rem;
-      margin-top: 1rem;
-      font-size: 0.9rem;
-      display: none; /* Initially hidden */
-    }
-    .loading {
-      display: none; /* Initially hidden */
-      margin-top: 1rem;
-      text-align: center;
-    }
-    .spinner {
-      border: 4px solid rgba(0, 0, 0, 0.1);
-      border-radius: 50%;
-      border-top: 4px solid var(--primary);
-      width: 30px;
-      height: 30px;
-      animation: spin 1s linear infinite;
-      margin: 0 auto 0.5rem auto; /* Add space below spinner */
-    }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-    .file-info {
-      margin-top: 0.5rem;
-      font-size: 0.9rem;
-      color: #666;
-    }
-    .copyright {
-      text-align: center;
-      margin-top: 2rem;
-      padding: 1rem;
-      color: #666;
-      font-size: 0.9rem;
-    }
-    .about-content {
-      margin-bottom: 1.5rem;
-      background-color: var(--light);
-      padding: 1.5rem;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    }
-    .language-selector {
-      margin-bottom: 1.5rem;
-      text-align: center;
-      display: flex; /* Align label and select */
-      justify-content: center;
-      align-items: center;
-      gap: 0.5rem;
-    }
-     .language-selector label {
-         margin-top: 0; /* Reset margin for flex alignment */
-     }
-     .language-selector select {
-         width: auto; /* Allow select to size naturally */
-         max-width: 150px; /* Limit width */
-         margin-top: 0; /* Reset margin */
-     }
   </style>
 </head>
 <body>
   <div class="container">
-    <div class="tabs" role="tablist">
-      <div class="tab active" onclick="switchTab('converter')" role="tab" aria-selected="true" aria-controls="converter" id="tab-converter">Konwerter</div>
-      <div class="tab" onclick="switchTab('about')" role="tab" aria-selected="false" aria-controls="about" id="tab-about">O mnie</div>
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('converter')">Converter</div>
+      <div class="tab" onclick="switchTab('about')">About</div>
     </div>
 
-    <div id="converter" class="tab-content active" role="tabpanel" aria-labelledby="tab-converter">
-      <div class="language-selector">
-        <label for="languageSelectConverter">🌍 Język:</label>
-        <select id="languageSelectConverter" onchange="setLanguage(this.value)">
-          <option value="en">English</option>
-          <option value="pl" selected>Polski</option>
-          <option value="uk">Українська</option>
-        </select>
-      </div>
+    <div id="converter" class="tab-content active">
+      <h1 id="mainTitle">📅 Class Schedule Converter</h1>
 
-      <h1 id="mainTitle">📅 Konwerter Planu Zajęć AEH</h1>
+      <label id="languageLabel">🌍 Language:</label>
+      <select id="languageSelect" onchange="setLanguage()">
+        <option value="en">English</option>
+        <option value="pl">Polski</option>
+        <option value="uk">Українська</option>
+      </select>
 
-      <label for="fileInput" id="fileLabel">Wybierz plik z planem zajęć:</label>
-      <input type="file" id="fileInput" accept=".xls,.xlsx" aria-describedby="fileError fileInfo">
-      <div id="fileInfo" class="file-info"></div>
-      <div id="fileError" class="error-message" role="alert"></div> {/* Added role="alert" */}
+      <label for="fileInput" id="fileLabel">Select your schedule file:</label>
+      <input type="file" id="fileInput" accept=".xls,.xlsx">
 
-      <button onclick="convertToIcs()" class="btn" id="convertBtn" disabled>
-        <i class="fas fa-exchange-alt"></i> <span id="convertText">Konwertuj do Kalendarza</span>
+      <button onclick="convertToIcs()" class="btn" id="convertBtn">
+        <i class="fas fa-exchange-alt"></i> <span id="convertText">Convert to Calendar</span>
       </button>
 
-      <div class="loading" id="loadingIndicator">
-        <div class="spinner"></div>
-        <p id="loadingText">Przetwarzanie planu zajęć...</p>
-      </div>
-
-      <a id="downloadLink" class="btn btn-success" download="plan_zajec.ics">
-        <i class="fas fa-download"></i> <span id="downloadText">Pobierz plik ICS</span>
+      <a id="downloadLink" class="btn btn-success" download="class_schedule.ics">
+        <i class="fas fa-download"></i> <span id="downloadText">Download ICS File</span>
       </a>
     </div>
 
-    <div id="about" class="tab-content" role="tabpanel" aria-labelledby="tab-about" hidden>
-      <div class="language-selector">
-        <label for="languageSelectAbout">🌍 Język:</label>
-        <select id="languageSelectAbout" onchange="setLanguage(this.value)">
-          <option value="en">English</option>
-          <option value="pl" selected>Polski</option>
-          <option value="uk">Українська</option>
-        </select>
-      </div>
-
-      <h2 id="aboutTitle">O mnie</h2>
-      <div class="about-content">
-        <p id="aboutText1">Jestem specjalistą ds. marketingu z doświadczeniem w administracji biurowej, wsparciu technicznym i marketingu produktowym. Posiadam licencjat z marketingu i obecnie studiuję na magisterce z Zarządzania Marketingowego.</p>
-        <p id="aboutText2">Moja praca koncentruje się na wspieraniu wprowadzania produktów na rynek, tworzeniu materiałów marketingowych oraz podnoszeniu jakości treści przy użyciu narzędzi takich jak Power BI, Excel, SAP i Power Platform. Stawiam na praktyczne rozwiązania, klarowną komunikację i zwiększanie efektywności marketingu poprzez technologie.</p>
-        <p id="aboutText3">Posługuję się płynnie językiem ukraińskim, polskim, angielskim i niemieckim, a obecnie uczę się hiszpańskiego i chińskiego. Cenię sobie pracę w międzynarodowym środowisku i współpracę międzyzespołową.</p>
-        <p id="aboutText4">Poza pracą pasjonuję się podróżami, czytaniem, nowymi technologiami, aktywnym stylem życia i organizacją wydarzeń. Stale rozwijam swoje umiejętności i poszukuję nowych wyzwań zawodowych.</p>
-      </div>
-      <a href="https://www.linkedin.com/in/vasyl-madei-399488247/" target="_blank" rel="noopener noreferrer" class="btn"> {/* Added rel attribute */}
-          <i class="fab fa-linkedin"></i> <span id="linkedinText">Profil LinkedIn</span> {/* Added LinkedIn icon */}
-      </a>
-
+    <div id="about" class="tab-content">
+      <h2 id="aboutTitle">About</h2>
+      <p id="aboutText1"></p>
+      <p id="aboutText2"></p>
+      <p id="aboutText3"></p>
+      <p id="aboutText4"></p>
+      <a href="https://www.linkedin.com/in/vasyl-madei-399488247/" target="_blank" class="btn" id="linkedinText">LinkedIn Profile</a>
     </div>
   </div>
-
-  <footer class="copyright" id="copyrightText">
-      </footer>
-
 
   <script>
     const translations = {
       en: {
-        mainTitle: "📅 AEH Class Schedule Converter",
         fileLabel: "Select your schedule file:",
         convertText: "Convert to Calendar",
         downloadText: "Download ICS File",
         noFileError: "Please select a file first",
-        invalidFileError: "The selected file is not a valid schedule file (missing required columns like start date, end date, or subject)",
         fileError: "Error processing file: ",
-        loadingText: "Processing your schedule...",
-        aboutTitle: "About Me",
-        aboutText1: "I'm a marketing professional with a background in office administration, technical support, and product marketing. I hold a Bachelor's degree in Marketing and am currently studying for my Master's in Marketing Management.",
-        aboutText2: "My work centers around supporting product launches, creating and maintaining marketing assets, and improving content quality using tools like Power BI, Excel, SAP, and Power Platform. I focus on practical solutions, clear communication, and making marketing more effective through technology.",
-        aboutText3: "I speak Ukrainian, Polish, English, and German, and I'm learning Spanish and Chinese. I enjoy working in international environments and collaborating across teams.",
-        aboutText4: "Outside of work, I'm passionate about travel, reading, exploring technology, staying active, and organizing events. I'm always looking to grow, improve, and take on new challenges.",
-        linkedinText: "LinkedIn Profile",
-        copyrightText: "© {year} Vasyl Madei" // Placeholder for year
-      },
-      pl: {
-        mainTitle: "📅 Konwerter Planu Zajęć AEH",
-        fileLabel: "Wybierz plik z planem zajęć:",
-        convertText: "Konwertuj do Kalendarza",
-        downloadText: "Pobierz plik ICS",
-        noFileError: "Proszę wybrać plik",
-        invalidFileError: "Wybrany plik nie jest prawidłowym plikiem z planem zajęć (brak wymaganych kolumn np. data rozpoczęcia, data zakończenia lub nazwa przedmiotu)",
-        fileError: "Błąd przetwarzania pliku: ",
-        loadingText: "Przetwarzanie planu zajęć...",
-        aboutTitle: "O mnie",
-        aboutText1: "Jestem specjalistą ds. marketingu z doświadczeniem w administracji biurowej, wsparciu technicznym i marketingu produktowym. Posiadam licencjat z marketingu i obecnie studiuję na magisterce z Zarządzania Marketingowego.",
-        aboutText2: "Moja praca koncentruje się na wspieraniu wprowadzania produktów na rynek, tworzeniu materiałów marketingowych oraz podnoszeniu jakości treści przy użyciu narzędzi takich jak Power BI, Excel, SAP i Power Platform. Stawiam na praktyczne rozwiązania, klarowną komunikację i zwiększanie efektywności marketingu poprzez technologie.",
-        aboutText3: "Posługuję się płynnie językiem ukraińskim, polskim, angielskim i niemieckim, a obecnie uczę się hiszpańskiego i chińskiego. Cenię sobie pracę w międzynarodowym środowisku i współpracę międzyzespołową.",
-        aboutText4: "Poza pracą pasjonuję się podróżami, czytaniem, nowymi technologiami, aktywnym stylem życia i organizacją wydarzeń. Stale rozwijam swoje umiejętności i poszukuję nowych wyzwań zawodowych.",
-        linkedinText: "Profil LinkedIn",
-        copyrightText: "© {year} Vasyl Madei" // Placeholder for year
-      },
-      uk: {
-        mainTitle: "📅 Конвертер Розкладу AEH",
-        fileLabel: "Виберіть файл з розкладом:",
-        convertText: "Конвертувати в Календар",
-        downloadText: "Завантажити файл ICS",
-        noFileError: "Будь ласка, виберіть файл",
-        invalidFileError: "Вибраний файл не є валідним файлом з розкладом (відсутні необхідні стовпці, наприклад, дата початку, дата закінчення або назва предмету)",
-        fileError: "Помилка обробки файлу: ",
-        loadingText: "Обробка вашого розкладу...",
-        aboutTitle: "Про мене",
-        aboutText1: "Я маркетолог з досвідом у офісній адміністрації, технічній підтримці та продуктовому маркетингу. Маю ступінь бакалавра з маркетингу та зараз навчаюся на магістратурі з маркетингового менеджменту.",
-        aboutText2: "Моя робота зосереджена на підтримці запусків продуктів, створенні маркетингових матеріалів та покращенні якості контенту за допомогою таких інструментів як Power BI, Excel, SAP та Power Platform. Я роблю акцент на практичні рішення, чітку комунікацію та підвищення ефективності маркетингу через технології.",
-        aboutText3: "Вільно володію українською, польською, англійською та німецькою мовами, а зараз вивчаю іспанську та китайську. Ціную роботу в міжнародному середовищі та міжкомандну співпрацю.",
-        aboutText4: "Поза роботою захоплююсь подорожами, читанням, новітніми технологіями, активним способом життя та організацією заходів. Постійно розвиваю свої навички та шукаю нові професійні виклики.",
-        linkedinText: "Профіль LinkedIn",
-        copyrightText: "© {year} Василь Мадей" // Placeholder for year, translated name
+        aboutTitle: "About",
+        aboutText1: "I'm a marketing professional with a background in office administration, technical support, and product marketing.",
+        aboutText2: "My work focuses on supporting launches, creating marketing materials, and improving content quality using Power BI, Excel, SAP and Power Platform.",
+        aboutText3: "I speak Ukrainian, Polish, English, and German, and I'm learning Spanish and Chinese.",
+        aboutText4: "Outside of work, I'm passionate about travel, reading, exploring tech, staying active, and organizing events.",
+        linkedinText: "LinkedIn Profile"
       }
     };
 
     function switchTab(tab) {
-      document.querySelectorAll('.tab').forEach(t => {
-        t.classList.remove('active');
-        t.setAttribute('aria-selected', 'false');
-      });
-      document.querySelectorAll('.tab-content').forEach(tc => {
-        tc.classList.remove('active');
-        tc.setAttribute('hidden', 'true');
-      });
-
-      const activeTab = document.querySelector(`.tab[onclick="switchTab('${tab}')"]`);
-      const activeContent = document.getElementById(tab);
-
-      if (activeTab) {
-          activeTab.classList.add('active');
-          activeTab.setAttribute('aria-selected', 'true');
-      }
-      if (activeContent) {
-          activeContent.classList.add('active');
-          activeContent.removeAttribute('hidden');
-      }
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+      document.querySelector(`.tab[onclick="switchTab('${tab}')"]`).classList.add('active');
+      document.getElementById(tab).classList.add('active');
     }
 
-    function setLanguage(lang) {
-      // Update both select dropdowns to stay in sync
-      document.getElementById("languageSelectConverter").value = lang;
-      document.getElementById("languageSelectAbout").value = lang;
-
-      const t = translations[lang];
-      const year = new Date().getFullYear(); // Get current year for copyright
-
-      // Update elements with corresponding IDs
+    function setLanguage() {
+      const lang = document.getElementById("languageSelect").value;
+      const t = translations[lang] || translations.en;
       for (const key in t) {
-        // Skip copyrightText here, handle it separately for the footer
-        if (key === 'copyrightText') continue;
-
         const el = document.getElementById(key);
-        if (el) {
-            el.textContent = t[key];
-        }
-      }
-
-      // Update the footer copyright text
-      const copyrightDiv = document.getElementById('copyrightText'); // Use the ID
-      if (copyrightDiv) {
-        copyrightDiv.textContent = t.copyrightText.replace('{year}', year);
+        if (el) el.textContent = t[key];
       }
     }
 
     function formatDate(dateStr) {
-      // Robust date formatting function
       if (!dateStr) return '';
-
-      // Try parsing Polish format first (DD.MM.YYYY HH:MM)
-      if (typeof dateStr === 'string') {
-        const plMatch = dateStr.match(/(\d{2})\.(\d{2})\.(\d{4})\s+(\d{2}):(\d{2})/);
-        if (plMatch) {
-          const [_, day, month, year, hour, minute] = plMatch;
-          // Basic validation
-          if (parseInt(month, 10) >= 1 && parseInt(month, 10) <= 12 && parseInt(day, 10) >= 1 && parseInt(day, 10) <= 31) {
-               return `${year}${month}${day}T${hour}${minute}00`;
-          }
-        }
+      const match = dateStr.toString().match(/(\\d{2})\\.(\\d{2})\\.(\\d{4}) (\\d{2}):(\\d{2})/);
+      if (match) {
+        const [_, d, m, y, h, min] = match;
+        return `${y}${m}${d}T${h}${min}00`;
       }
-
-      // Try parsing Excel date serial number
-      if (typeof dateStr === 'number' && dateStr > 0) {
-          // Excel date serial numbers represent days since 1900-01-00 (or 1904-01-01).
-          // 25569 corresponds to 1970-01-01 UTC.
-          // The formula converts Excel days to milliseconds since Unix epoch (UTC)
-          const jsTimestampUTC = (dateStr - 25569) * 86400 * 1000;
-          // Create date object - it will be interpreted in the *local* timezone by default
-          const date = new Date(jsTimestampUTC);
-
-          // Check if it's a valid date
-          if (!isNaN(date.getTime())) {
-              // Get parts based on *local* time because TZID will handle the offset
-              const year = date.getFullYear();
-              const month = (date.getMonth() + 1).toString().padStart(2, '0');
-              const day = date.getDate().toString().padStart(2, '0');
-              const hours = date.getHours().toString().padStart(2, '0');
-              const minutes = date.getMinutes().toString().padStart(2, '0');
-              const seconds = date.getSeconds().toString().padStart(2, '0');
-              return `${year}${month}${day}T${hours}${minutes}${seconds}`;
-          }
-      }
-
-      // Try parsing with Date constructor as a fallback (might be unreliable)
-      try {
-            const date = new Date(dateStr);
-            if (!isNaN(date.getTime())) {
-                // Get parts based on *local* time
-                const year = date.getFullYear();
-                const month = (date.getMonth() + 1).toString().padStart(2, '0');
-                const day = date.getDate().toString().padStart(2, '0');
-                const hours = date.getHours().toString().padStart(2, '0');
-                const minutes = date.getMinutes().toString().padStart(2, '0');
-                const seconds = date.getSeconds().toString().padStart(2, '0');
-                return `${year}${month}${day}T${hours}${minutes}${seconds}`;
-            }
-      } catch (e) {
-          // Ignore parsing errors here, fall through to warning
-      }
-
-
-      console.warn("Could not format date:", dateStr); // Log warning if formatting fails
-      return ''; // Return empty string if no format matches
+      return '';
     }
 
     function escapeIcalText(text) {
-      // Escapes characters for iCalendar text fields
-      return String(text || '')
-        .replace(/\\/g, '\\\\') // Escape backslashes first
-        .replace(/,/g, '\\,')
-        .replace(/;/g, '\\;')
-        .replace(/\n/g, '\\n'); // Escape newlines
+      return String(text).replace(/\\\\/g, '\\\\').replace(/,/g, '\\,').replace(/;/g, '\\;').replace(/\\n/g, '\\n');
     }
 
-    // Finds the index of the first header that includes the searchText (case-insensitive)
-    function findHeaderIndex(headers, searchText) {
-        if (!searchText) return -1;
-        const lowerSearchText = searchText.toLowerCase();
-        return headers.findIndex(header => String(header || '').toLowerCase().trim().includes(lowerSearchText));
-    }
-
-    // --- Main Conversion Function ---
     function convertToIcs() {
-      const lang = document.getElementById("languageSelectConverter").value;
-      const t = translations[lang];
+      const lang = document.getElementById("languageSelect").value;
+      const t = translations[lang] || translations.en;
       const fileInput = document.getElementById("fileInput");
-      const loadingIndicator = document.getElementById("loadingIndicator");
-      const convertBtn = document.getElementById("convertBtn");
-      const downloadLink = document.getElementById('downloadLink');
-
-      // --- 1. Basic File Check ---
-      if (!fileInput.files || fileInput.files.length === 0) {
-        showError(t.noFileError);
-        return;
-      }
-      const file = fileInput.files[0];
-
-      // --- 2. UI Setup ---
-      loadingIndicator.style.display = 'block';
-      convertBtn.disabled = true;
-      downloadLink.style.display = 'none'; // Hide previous link
-      hideError(); // Hide previous errors
+      if (!fileInput.files.length) return alert(t.noFileError);
 
       const reader = new FileReader();
-
       reader.onload = function(e) {
-        let ics = ''; // Initialize ICS string
         try {
-          // --- 3. Read Excel File ---
           const data = new Uint8Array(e.target.result);
-          // Consider { cellDates: true } if dates are consistently problematic
-          // Or { dateNF: 'dd.mm.yyyy hh:mm' } if format is fixed
           const wb = XLSX.read(data, { type: 'array' });
-
-          if (!wb.SheetNames || wb.SheetNames.length === 0) {
-            throw new Error("Workbook is empty or unreadable.");
-          }
-
-          // Assume data is on the first sheet
           const ws = wb.Sheets[wb.SheetNames[0]];
-          if (!ws) {
-             throw new Error(`Sheet "${wb.SheetNames[0]}" not found.`);
-          }
+          const json = XLSX.utils.sheet_to_json(ws, { header: 1 });
 
-          // Read sheet to JSON array of arrays, skip blank rows
-          const json = XLSX.utils.sheet_to_json(ws, { header: 1, blankrows: false });
-
-          if (json.length < 2) { // Need at least header + 1 data row
-            throw new Error("Sheet has no data rows.");
-          }
-
-          // --- 4. Header Mapping ---
-          const headers = json[0].map(h => String(h || '').trim()); // Ensure headers are strings and trimmed
-
-          const startIndex = findHeaderIndex(headers, 'data rozpoczęcia');
-          const endIndex = findHeaderIndex(headers, 'data zakończenia');
-          // Using 'nazwa pełna przedmiotu' as the subject header
-          const subjectIndex = findHeaderIndex(headers, 'nazwa pełna przedmiotu');
-          // Location is the last column *with a header text*
-          let locationIndex = -1;
-          for (let k = headers.length - 1; k >= 0; k--) {
-              if (headers[k]) { // Find the last non-empty header
-                  locationIndex = k;
-                  break;
-              }
-          }
-
-          // Validate required columns were found
-          if (startIndex === -1 || endIndex === -1 || subjectIndex === -1) {
-              console.error("Missing required headers:", {
-                  'data rozpoczęcia': startIndex,
-                  'data zakończenia': endIndex,
-                  'nazwa pełna przedmiotu': subjectIndex
-              });
-              throw new Error(t.invalidFileError); // Use the specific error message
-          }
-          if (locationIndex === -1) {
-              console.warn("Could not determine location column (no headers found?). Location will be empty.");
-          }
-
-
-          // Identify indices for the description field (all columns *except* key ones)
-          const keyIndices = [startIndex, endIndex, subjectIndex, locationIndex].filter(idx => idx !== -1);
-          const descriptionIndices = headers
-              .map((_, index) => index) // Get all indices
-              .filter(index => headers[index] && !keyIndices.includes(index)); // Filter out empty headers and key columns
-
-
-          // --- 5. Build ICS String ---
-          ics = `BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//AEH Schedule Converter V2.1//EN\nCALSCALE:GREGORIAN\nMETHOD:PUBLISH\n`; // Added METHOD
-          // Add Timezone definition (essential for correct time display)
-          // Simplified VTIMEZONE for broader compatibility
-          ics += `BEGIN:VTIMEZONE\nTZID=Europe/Warsaw\n`;
-          ics += `BEGIN:DAYLIGHT\nTZOFFSETFROM:+0100\nTZOFFSETTO:+0200\nTZNAME:CEST\nDTSTART:19700329T020000\nRRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU\nEND:DAYLIGHT\n`;
-          ics += `BEGIN:STANDARD\nTZOFFSETFROM:+0200\nTZOFFSETTO:+0100\nTZNAME:CET\nDTSTART:19701025T030000\nRRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU\nEND:STANDARD\n`;
-          ics += `END:VTIMEZONE\n`;
-
-          // --- 6. Process Data Rows ---
+          let ics = `BEGIN:VCALENDAR\\nVERSION:2.0\\nCALSCALE:GREGORIAN`;
           for (let i = 1; i < json.length; i++) {
             const row = json[i];
-            // Skip row if it doesn't have enough columns or looks empty
-            if (!row || row.length < Math.max(startIndex, endIndex, subjectIndex, locationIndex)) continue;
+            const start = formatDate(row[0]);
+            const end = formatDate(row[1]);
+            const summary = escapeIcalText(row[4] || "");
+            const description = escapeIcalText(
+              [row[6], row[7], row[8]].filter(Boolean).join("\\n")
+            );
+            const location = escapeIcalText(row[10] || "");
 
-            const startDateRaw = row[startIndex];
-            const endDateRaw = row[endIndex];
-            const subjectRaw = row[subjectIndex];
-            // Only get location if index is valid
-            const locationRaw = locationIndex !== -1 ? row[locationIndex] : '';
-
-            // Format dates
-            const start = formatDate(startDateRaw);
-            const end = formatDate(endDateRaw);
-            const subjectText = String(subjectRaw || '').trim(); // Get subject as string
-
-            // Skip row if essential data is missing or unformattable
-            if (!start || !end || !subjectText) {
-              console.warn(`Skipping row ${i+1}: Missing or invalid start date, end date, or subject.`, { start, end, subjectText });
-              continue;
+            if (start && end && summary) {
+              ics += `\\nBEGIN:VEVENT\\nDTSTART:${start}\\nDTEND:${end}\\nSUMMARY:${summary}`;
+              if (description) ics += `\\nDESCRIPTION:${description}`;
+              if (location) ics += `\\nLOCATION:${location}`;
+              ics += `\\nEND:VEVENT`;
             }
-
-            // Build description from other columns
-            const descriptionParts = [];
-            descriptionIndices.forEach(index => {
-              const header = headers[index];
-              const value = String(row[index] || '').trim(); // Ensure value is string and trimmed
-              // Only add if value exists
-              if (value) {
-                descriptionParts.push(`${header}: ${value}`);
-              }
-            });
-            // Escape the final description string including newlines
-            const description = escapeIcalText(descriptionParts.join('\n'));
-
-            // Process location
-            let location = '';
-            if (locationRaw) {
-                const locationStr = String(locationRaw).trim();
-                // Special handling for Teams links/meetings
-                if (locationStr.toLowerCase().includes('teams') || locationStr.toLowerCase().includes('on-line')) {
-                    location = escapeIcalText('Online / MS Teams'); // Standardized location
-                } else if (locationStr) { // Check if not empty after trimming
-                    location = escapeIcalText(locationStr);
-                }
-            }
-
-            // Escape the subject text
-            const subject = escapeIcalText(subjectText);
-
-            // Build VEVENT
-            ics += `BEGIN:VEVENT\n`;
-            // Use TZID for local time interpretation
-            ics += `DTSTART;TZID=Europe/Warsaw:${start}\n`;
-            ics += `DTEND;TZID=Europe/Warsaw:${end}\n`;
-            ics += `SUMMARY:${subject}\n`;
-            if (description) {
-              ics += `DESCRIPTION:${description}\n`; // Escaped string already contains \n
-            }
-            if (location) {
-              ics += `LOCATION:${location}\n`;
-            }
-            // Generate a unique ID for the event
-            const uid = `${start}-${end}-${subjectIndex}-${i}@aeh-converter-${file.name}`;
-            ics += `UID:${escapeIcalText(uid)}\n`; // Escape UID just in case
-            ics += `DTSTAMP:${new Date().toISOString().replace(/[-:.]/g, '')}Z\n`; // Add DTSTAMP (creation time)
-            ics += `END:VEVENT\n`;
           }
+          ics += `\\nEND:VCALENDAR`;
 
-          ics += `END:VCALENDAR`;
-
-          // --- 7. Create Download Link ---
-          const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
-          downloadLink.href = URL.createObjectURL(blob);
-          // Suggest a filename based on original file, replacing extension
-          const downloadFilename = file.name.replace(/\.(xlsx|xls)$/i, '.ics');
-          downloadLink.download = downloadFilename;
-          downloadLink.style.display = 'inline-flex'; // Show download button (use inline-flex like other buttons)
-
+          const blob = new Blob([ics.replace(/\\\\n/g, '\\n')], { type: 'text/calendar' });
+          const link = document.getElementById('downloadLink');
+          link.href = URL.createObjectURL(blob);
+          link.style.display = 'inline-block';
         } catch (err) {
-          console.error("Error during conversion:", err);
-          // Show specific error message if available, otherwise generic
-          const specificError = t.invalidFileError;
-          const generalError = t.fileError;
-          showError(err.message && err.message.includes(specificError) ? err.message : generalError + (err.message || 'Unknown error'));
-        } finally {
-          // --- 8. UI Cleanup ---
-          loadingIndicator.style.display = 'none';
-          convertBtn.disabled = false;
+          alert(t.fileError + err.message);
         }
       };
-
-      reader.onerror = function() {
-        console.error("File Reading Error:", reader.error);
-        showError(t.fileError + (reader.error.message || reader.error));
-        loadingIndicator.style.display = 'none';
-        convertBtn.disabled = false;
-      };
-
-      // Start reading the file
-      reader.readAsArrayBuffer(file);
-    }
-
-    function showError(message) {
-      const errorElement = document.getElementById("fileError");
-      errorElement.textContent = message;
-      errorElement.style.display = 'block';
-      // Auto-hide after 7 seconds
-      setTimeout(hideError, 7000);
-    }
-
-    function hideError() {
-         const errorElement = document.getElementById("fileError");
-         errorElement.style.display = 'none';
-         errorElement.textContent = '';
+      reader.readAsArrayBuffer(fileInput.files[0]);
     }
 
     window.onload = () => {
-      // Set default language and update dynamic elements like copyright year
-      setLanguage('pl'); // Set initial language
-
-      const fileInput = document.getElementById("fileInput");
-      const fileInfo = document.getElementById("fileInfo");
-      const convertBtn = document.getElementById("convertBtn");
-      const downloadLink = document.getElementById('downloadLink');
-      const langSelectConverter = document.getElementById("languageSelectConverter");
-      const langSelectAbout = document.getElementById("languageSelectAbout");
-
-      // Function to update file info text based on current language
-      const updateFileInfoText = () => {
-          if(fileInput.files.length > 0) {
-               const file = fileInput.files[0];
-               const lang = langSelectConverter.value;
-               const selectedText = { en: 'Selected', pl: 'Wybrano', uk: 'Вибрано' }[lang] || 'Selected';
-               fileInfo.textContent = `${selectedText}: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`; // Use MB for larger files
-           } else {
-               fileInfo.textContent = '';
-           }
-      }
-
-      fileInput.addEventListener('change', function(e) {
-        hideError(); // Clear errors on new file selection
-        downloadLink.style.display = 'none'; // Hide previous download link
-
-        if (e.target.files && e.target.files.length > 0) {
-          convertBtn.disabled = false;
-        } else {
-          convertBtn.disabled = true;
-        }
-        updateFileInfoText(); // Update text after selecting/deselecting file
-      });
-
-      // Add listener to language selectors to update file info text if file is already selected
-      langSelectConverter.addEventListener('change', function(e) {
-            setLanguage(e.target.value); // Update all texts
-            updateFileInfoText(); // Update file info specifically
-       });
-
-       // Sync About language selector change to Converter selector (and trigger update)
-        langSelectAbout.addEventListener('change', function(e) {
-            setLanguage(e.target.value); // Update all texts
-            updateFileInfoText(); // Update file info specifically
-        });
-
+      const lang = navigator.language.slice(0, 2);
+      document.getElementById("languageSelect").value = ['en', 'pl', 'uk'].includes(lang) ? lang : 'en';
+      setLanguage();
     };
   </script>
 </body>
