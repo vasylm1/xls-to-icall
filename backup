@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Konwerter Planu Zajęć AEH</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #4361ee;
+      --secondary: #3f37c9;
+      --accent: #4895ef;
+      --light: #f8f9fa;
+      --dark: #212529;
+      --error: #e63946;
+      --success: #2ecc71;
+    }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #dfe7f5 100%);
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .container {
+      max-width: 900px;
+      margin: auto;
+      padding: 2rem;
+      flex: 1;
+    }
+    .tabs {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .tab {
+      padding: 0.75rem 1.5rem;
+      background: var(--light);
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      transition: all 0.3s ease;
+    }
+    .tab:hover {
+      transform: translateY(-2px);
+    }
+    .tab.active {
+      background: var(--primary);
+      color: white;
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+      animation: fadeIn 0.5s ease;
+    }
+    h1, h2 {
+      background: linear-gradient(45deg, var(--primary), var(--secondary));
+      color: white;
+      padding: 1rem;
+      border-radius: 12px;
+      text-align: center;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+    label, p {
+      font-size: 1rem;
+      margin-top: 1rem;
+      display: block;
+    }
+    input[type="file"], select {
+      padding: 0.75rem;
+      width: 100%;
+      max-width: 400px;
+      border: 2px solid #e9ecef;
+      border-radius: 8px;
+      margin-top: 0.5rem;
+      transition: border 0.3s ease;
+    }
+    input[type="file"]:focus, select:focus {
+      border-color: var(--accent);
+      outline: none;
+    }
+    .btn {
+      margin-top: 1.5rem;
+      background: linear-gradient(45deg, var(--primary), var(--secondary));
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      transition: all 0.3s ease;
+    }
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+    .btn:disabled {
+      background: #cccccc;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+    .btn-success {
+      background: linear-gradient(45deg, var(--success), #27ae60);
+      text-decoration: none;
+      display: none;
+      margin-top: 1rem;
+    }
+    .error-message {
+      color: var(--error);
+      margin-top: 0.5rem;
+      font-size: 0.9rem;
+      display: none;
+    }
+    .loading {
+      display: none;
+      margin-top: 1rem;
+      text-align: center;
+    }
+    .spinner {
+      border: 4px solid rgba(0, 0, 0, 0.1);
+      border-radius: 50%;
+      border-top: 4px solid var(--primary);
+      width: 30px;
+      height: 30px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    .file-info {
+      margin-top: 0.5rem;
+      font-size: 0.9rem;
+      color: #666;
+    }
+    .copyright {
+      text-align: center;
+      margin-top: 2rem;
+      padding: 1rem;
+      color: #666;
+      font-size: 0.9rem;
+    }
+    .about-content {
+      margin-bottom: 1.5rem;
+    }
+    .language-selector {
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="tabs" role="tablist">
+      <div class="tab active" onclick="switchTab('converter')" role="tab" aria-selected="true" aria-controls="converter" id="tab-converter">Konwerter</div>
+      <div class="tab" onclick="switchTab('about')" role="tab" aria-selected="false" aria-controls="about" id="tab-about">O mnie</div>
+    </div>
+
+    <div id="converter" class="tab-content active" role="tabpanel" aria-labelledby="tab-converter">
+      <div class="language-selector">
+        <label for="languageSelectConverter">🌍 Język:</label>
+        <select id="languageSelectConverter" onchange="setLanguage(this.value)">
+          <option value="en">English</option>
+          <option value="pl" selected>Polski</option>
+          <option value="uk">Українська</option>
+        </select>
+      </div>
+
+      <h1 id="mainTitle">📅 Konwerter Planu Zajęć AEH</h1>
+
+      <label for="fileInput" id="fileLabel">Wybierz plik z planem zajęć:</label>
+      <input type="file" id="fileInput" accept=".xls,.xlsx" aria-describedby="fileError fileInfo">
+      <div id="fileInfo" class="file-info"></div>
+      <div id="fileError" class="error-message"></div>
+
+      <button onclick="convertToIcs()" class="btn" id="convertBtn" disabled>
+        <i class="fas fa-exchange-alt"></i> <span id="convertText">Konwertuj do Kalendarza</span>
+      </button>
+
+      <div class="loading" id="loadingIndicator">
+        <div class="spinner"></div>
+        <p id="loadingText">Przetwarzanie planu zajęć...</p>
+      </div>
+
+      <a id="downloadLink" class="btn btn-success" download="plan_zajec.ics">
+        <i class="fas fa-download"></i> <span id="downloadText">Pobierz plik ICS</span>
+      </a>
+    </div>
+
+    <div id="about" class="tab-content" role="tabpanel" aria-labelledby="tab-about" hidden>
+      <div class="language-selector">
+        <label for="languageSelectAbout">🌍 Język:</label>
+        <select id="languageSelectAbout" onchange="setLanguage(this.value)">
+          <option value="en">English</option>
+          <option value="pl" selected>Polski</option>
+          <option value="uk">Українська</option>
+        </select>
+      </div>
+
+      <h2 id="aboutTitle">O mnie</h2>
+      <div class="about-content">
+        <p id="aboutText1">Jestem specjalistą ds. marketingu z doświadczeniem w administracji biurowej, wsparciu technicznym i marketingu produktowym. Posiadam licencjat z marketingu i obecnie studiuję na magisterce z Zarządzania Marketingowego.</p>
+        <p id="aboutText2">Moja praca koncentruje się na wspieraniu wprowadzania produktów na rynek, tworzeniu materiałów marketingowych oraz podnoszeniu jakości treści przy użyciu narzędzi takich jak Power BI, Excel, SAP i Power Platform. Stawiam na praktyczne rozwiązania, klarowną komunikację i zwiększanie efektywności marketingu poprzez technologie.</p>
+        <p id="aboutText3">Posługuję się płynnie językiem ukraińskim, polskim, angielskim i niemieckim, a obecnie uczę się hiszpańskiego i chińskiego. Cenię sobie pracę w międzynarodowym środowisku i współpracę międzyzespołową.</p>
+        <p id="aboutText4">Poza pracą pasjonuję się podróżami, czytaniem, nowymi technologiami, aktywnym stylem życia i organizacją wydarzeń. Stale rozwijam swoje umiejętności i poszukuję nowych wyzwań zawodowych.</p>
+      </div>
+      <a href="https://www.linkedin.com/in/vasyl-madei-399488247/" target="_blank" class="btn" id="linkedinText">Profil LinkedIn</a>
+      <div class="copyright">© 2025</div>
+    </div>
+  </div>
+
+  <script>
+    const translations = {
+      en: {
+        mainTitle: "📅 AEH Class Schedule Converter",
+        fileLabel: "Select your schedule file:",
+        convertText: "Convert to Calendar",
+        downloadText: "Download ICS File",
+        noFileError: "Please select a file first",
+        invalidFileError: "The selected file is not a valid schedule file",
+        fileError: "Error processing file: ",
+        loadingText: "Processing your schedule...",
+        aboutTitle: "About Me",
+        aboutText1: "I'm a marketing professional with a background in office administration, technical support, and product marketing. I hold a Bachelor's degree in Marketing and am currently studying for my Master's in Marketing Management.",
+        aboutText2: "My work centers around supporting product launches, creating and maintaining marketing assets, and improving content quality using tools like Power BI, Excel, SAP, and Power Platform. I focus on practical solutions, clear communication, and making marketing more effective through technology.",
+        aboutText3: "I speak Ukrainian, Polish, English, and German, and I'm learning Spanish and Chinese. I enjoy working in international environments and collaborating across teams.",
+        aboutText4: "Outside of work, I'm passionate about travel, reading, exploring technology, staying active, and organizing events. I'm always looking to grow, improve, and take on new challenges.",
+        linkedinText: "LinkedIn Profile"
+      },
+      pl: {
+        mainTitle: "📅 Konwerter Planu Zajęć AEH",
+        fileLabel: "Wybierz plik z planem zajęć:",
+        convertText: "Konwertuj do Kalendarza",
+        downloadText: "Pobierz plik ICS",
+        noFileError: "Proszę wybrać plik",
+        invalidFileError: "Wybrany plik nie jest prawidłowym plikiem z planem zajęć",
+        fileError: "Błąd przetwarzania pliku: ",
+        loadingText: "Przetwarzanie planu zajęć...",
+        aboutTitle: "O mnie",
+        aboutText1: "Jestem specjalistą ds. marketingu z doświadczeniem w administracji biurowej, wsparciu technicznym i marketingu produktowym. Posiadam licencjat z marketingu i obecnie studiuję na magisterce z Zarządzania Marketingowego.",
+        aboutText2: "Moja praca koncentruje się na wspieraniu wprowadzania produktów na rynek, tworzeniu materiałów marketingowych oraz podnoszeniu jakości treści przy użyciu narzędzi takich jak Power BI, Excel, SAP i Power Platform. Stawiam na praktyczne rozwiązania, klarowną komunikację i zwiększanie efektywności marketingu poprzez technologie.",
+        aboutText3: "Posługuję się płynnie językiem ukraińskim, polskim, angielskim i niemieckim, a obecnie uczę się hiszpańskiego i chińskiego. Cenię sobie pracę w międzynarodowym środowisku i współpracę międzyzespołową.",
+        aboutText4: "Poza pracą pasjonuję się podróżami, czytaniem, nowymi technologiami, aktywnym stylem życia i organizacją wydarzeń. Stale rozwijam swoje umiejętności i poszukuję nowych wyzwań zawodowych.",
+        linkedinText: "Profil LinkedIn"
+      },
+      uk: {
+        mainTitle: "📅 Конвертер Розкладу AEH",
+        fileLabel: "Виберіть файл з розкладом:",
+        convertText: "Конвертувати в Календар",
+        downloadText: "Завантажити файл ICS",
+        noFileError: "Будь ласка, виберіть файл",
+        invalidFileError: "Вибраний файл не є валідним файлом з розкладом",
+        fileError: "Помилка обробки файлу: ",
+        loadingText: "Обробка вашого розкладу...",
+        aboutTitle: "Про мене",
+        aboutText1: "Я маркетолог з досвідом у офісній адміністрації, технічній підтримці та продуктовому маркетингу. Маю ступінь бакалавра з маркетингу та зараз навчаюся на магістратурі з маркетингового менеджменту.",
+        aboutText2: "Моя робота зосереджена на підтримці запусків продуктів, створенні маркетингових матеріалів та покращенні якості контенту за допомогою таких інструментів як Power BI, Excel, SAP та Power Platform. Я роблю акцент на практичні рішення, чітку комунікацію та підвищення ефективності маркетингу через технології.",
+        aboutText3: "Вільно володію українською, польською, англійською та німецькою мовами, а зараз вивчаю іспанську та китайську. Ціную роботу в міжнародному середовищі та міжкомандну співпрацю.",
+        aboutText4: "Поза роботою захоплююсь подорожами, читанням, новітніми технологіями, активним способом життя та організацією заходів. Постійно розвиваю свої навички та шукаю нові професійні виклики.",
+        linkedinText: "Профіль LinkedIn"
+      }
+    };
+
+    function switchTab(tab) {
+      document.querySelectorAll('.tab').forEach(t => {
+        t.classList.remove('active');
+        t.setAttribute('aria-selected', 'false');
+      });
+      document.querySelectorAll('.tab-content').forEach(tc => {
+        tc.classList.remove('active');
+        tc.setAttribute('hidden', 'true');
+      });
+      
+      document.querySelector(`.tab[onclick="switchTab('${tab}')"]`).classList.add('active');
+      document.querySelector(`.tab[onclick="switchTab('${tab}')"]`).setAttribute('aria-selected', 'true');
+      document.getElementById(tab).classList.add('active');
+      document.getElementById(tab).removeAttribute('hidden');
+    }
+
+    function setLanguage(lang) {
+      document.getElementById("languageSelectConverter").value = lang;
+      document.getElementById("languageSelectAbout").value = lang;
+      
+      const t = translations[lang];
+      for (const key in t) {
+        const el = document.getElementById(key);
+        if (el) el.textContent = t[key];
+      }
+    }
+
+    function formatDate(dateStr) {
+      if (!dateStr) return '';
+      
+      if (typeof dateStr === 'string') {
+        const plMatch = dateStr.match(/(\d{2})\.(\d{2})\.(\d{4}) (\d{2}):(\d{2})/);
+        if (plMatch) {
+          const [_, day, month, year, hour, minute] = plMatch;
+          return `${year}${month}${day}T${hour}${minute}00`;
+        }
+      }
+      
+      if (typeof dateStr === 'number') {
+        const date = new Date(Math.round((dateStr - 25569) * 86400 * 1000));
+        return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+      }
+      
+      const date = new Date(dateStr);
+      if (!isNaN(date.getTime())) {
+        return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+      }
+      
+      return '';
+    }
+
+    function escapeIcalText(text) {
+      return String(text || '')
+        .replace(/\\/g, '\\\\')
+        .replace(/,/g, '\\,')
+        .replace(/;/g, '\\;')
+        .replace(/\n/g, '\\n');
+    }
+
+    function validateExcelHeaders(headers) {
+      const requiredColumns = [
+        'data rozpoczęcia',
+        'data zakończenia',
+        'nazwa pełna przedmiotu'
+      ];
+      
+      const lowerHeaders = headers.map(h => String(h).toLowerCase().trim());
+      return requiredColumns.every(col => 
+        lowerHeaders.some(h => h.includes(col.toLowerCase()))
+      );
+    }
+
+    function convertToIcs() {
+      const lang = document.getElementById("languageSelectConverter").value;
+      const t = translations[lang];
+      const fileInput = document.getElementById("fileInput");
+      
+      if (!fileInput.files.length) {
+        showError(t.noFileError);
+        return;
+      }
+      
+      const loadingIndicator = document.getElementById("loadingIndicator");
+      const convertBtn = document.getElementById("convertBtn");
+      loadingIndicator.style.display = 'block';
+      convertBtn.disabled = true;
+      
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const data = new Uint8Array(e.target.result);
+          const wb = XLSX.read(data, { type: 'array' });
+          
+          if (wb.SheetNames.length === 0) {
+            throw new Error(t.invalidFileError);
+          }
+          
+          const ws = wb.Sheets[wb.SheetNames[0]];
+          const json = XLSX.utils.sheet_to_json(ws, { header: 1 });
+          
+          if (json.length < 2) {
+            throw new Error(t.invalidFileError);
+          }
+          
+          const headers = json[0].map(h => String(h).trim());
+          if (!validateExcelHeaders(headers)) {
+            throw new Error(t.invalidFileError);
+          }
+          
+          let ics = `BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//AEH Schedule Converter//EN\nCALSCALE:GREGORIAN\n`;
+          ics += `BEGIN:VTIMEZONE\nTZID=Europe/Warsaw\nBEGIN:STANDARD\nDTSTART:19701025T030000\nTZOFFSETFROM:+0200\nTZOFFSETTO:+0100\nTZNAME:CET\nEND:STANDARD\nBEGIN:DAYLIGHT\nDTSTART:19700329T020000\nTZOFFSETFROM:+0100\nTZOFFSETTO:+0200\nTZNAME:CEST\nEND:DAYLIGHT\nEND:VTIMEZONE\n`;
+          
+          for (let i = 1; i < json.length; i++) {
+            const row = json[i];
+            if (!row || row.length < 10) continue;
+            
+            const start = formatDate(row[0]);
+            const end = formatDate(row[1]);
+            const hours = row[2];
+            const summary = row[4];
+            const groupThematic = row[5];
+            const groupClass = row[6];
+            const lecturer = row[7];
+            const stageType = row[8];
+            const deanGroups = row[9];
+            const room = row[10] || '';
+            
+            if (!start || !summary) continue;
+
+            const description = escapeIcalText([
+              groupThematic && `Grupa tematyczna: ${groupThematic}`,
+              groupClass && `Grupa zajęciowa: ${groupClass}`,
+              lecturer && `Wykładowca: ${lecturer}`,
+              hours && `Godziny: ${hours}`,
+              stageType && `Etap: ${stageType}`,
+              deanGroups && `Grupy: ${deanGroups.toString().replace(/\n/g, ', ')}`
+            ].filter(Boolean).join("\\n"));
+            
+            const location = room.toLowerCase().includes('teams') 
+              ? 'Microsoft Teams' 
+              : room.replace(/Teams/g, '').trim();
+            
+            ics += `BEGIN:VEVENT\n`;
+            ics += `DTSTART;TZID=Europe/Warsaw:${start}\n`;
+            ics += `DTEND;TZID=Europe/Warsaw:${end}\n`;
+            ics += `SUMMARY:${escapeIcalText(summary)}\n`;
+            if (description) ics += `DESCRIPTION:${description}\n`;
+            if (location) ics += `LOCATION:${escapeIcalText(location)}\n`;
+            ics += `UID:${Date.now()}-${i}@aeh-converter\n`;
+            ics += `END:VEVENT\n`;
+          }
+          
+          ics += `END:VCALENDAR`;
+          
+          const blob = new Blob([ics], { type: 'text/calendar' });
+          const link = document.getElementById('downloadLink');
+          link.href = URL.createObjectURL(blob);
+          link.style.display = 'inline-block';
+          
+        } catch (err) {
+          showError(t.fileError + err.message);
+        } finally {
+          loadingIndicator.style.display = 'none';
+          convertBtn.disabled = false;
+        }
+      };
+      
+      reader.onerror = function() {
+        showError(t.fileError + reader.error);
+        loadingIndicator.style.display = 'none';
+        convertBtn.disabled = false;
+      };
+      
+      reader.readAsArrayBuffer(fileInput.files[0]);
+    }
+
+    function showError(message) {
+      const errorElement = document.getElementById("fileError");
+      errorElement.textContent = message;
+      errorElement.style.display = 'block';
+      setTimeout(() => {
+        errorElement.style.display = 'none';
+      }, 5000);
+    }
+
+    window.onload = () => {
+      setLanguage('pl');
+      
+      document.getElementById("fileInput").addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        const fileInfo = document.getElementById("fileInfo");
+        const convertBtn = document.getElementById("convertBtn");
+        const errorElement = document.getElementById("fileError");
+        
+        errorElement.style.display = 'none';
+        
+        if (file) {
+          fileInfo.textContent = `Wybrano: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+          convertBtn.disabled = false;
+        } else {
+          fileInfo.textContent = '';
+          convertBtn.disabled = true;
+        }
+      });
+    };
+  </script>
+</body>
+</html>
